@@ -1,0 +1,16 @@
+SELECT   p.*
+      ,  TO_CHAR(DATE_TRUNC('week', to_date(dte,'YYYY-MM-DD')), 'DD/MM') as wc
+      ,  cr_avg_ping
+      ,  ld_avg_ping
+FROM     pda p
+JOIN     (
+   SELECT   day
+         ,  hour
+         ,  ROUND(AVG(cr_ping)) AS cr_avg_ping
+         ,  ROUND(AVG(ld_ping)) AS ld_avg_ping
+   FROM     pda
+   WHERE    dte > '2018-01-01'
+   AND      dte < '2018-03-28'
+   GROUP BY day
+         ,  hour ) a
+ON       ( a.day = p.day AND a.hour = p.hour )

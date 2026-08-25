@@ -1,0 +1,554 @@
+---
+title: Docker CLI
+---
+## Definition file `dc.def`
+
+```bash
+# Docker
+
+# -------------------------------------------------------------------------------------------------
+= IMAGES
+# -------------------------------------------------------------------------------------------------
+
+list images (li) [<name>] :: \
+    if [[ "$1" == "" ]]; then \
+        docker images; \
+    else \
+        filter="${1//\*/.\*}"; \
+        filter="${filter//%/.\*}"; \
+        docker images 2>/dev/null | egrep "^$filter .*|IMAGE"; \
+    fi \
+    ## Use % or * as wildcards
+
+# -------------------------------------------------------------------------------------------------
+= CONTAINERS
+# -------------------------------------------------------------------------------------------------
+
+delete container (rm) <container_name> :: \
+    read -p "Are you sure [yN]? " yn; \
+    if [[ ${yn^} == Y ]]; then \
+        docker rm $1; \
+    fi \
+    !! docker ps --all --format '{{.Names}}' \
+
+list containers (ps) [<-d>] :: \
+    if [[ $1 == -d ]]; then docker ps --all; \ 
+    else \
+        tmp="$(docker ps --all --format 'table {{.ID}}\t{{.Names}}\t{{.Status}}\t{{.Size}}')"; \
+        echo "$tmp" | head -n1; \
+        echo "$tmp" | tail -n+2 | grep 'Up [0-9]* min' | sort -k2,2; \
+        echo "$tmp" | tail -n+2 | grep -v 'Up [0-9]* min' | sort -k 2,2; \
+    fi \
+    ## -d: show details
+
+logs (lo) [<-f>] <container-name> :: \
+    if [[ $1 == -f ]]; then docker logs -f $2; else docker logs $1; fi \
+    !! docker ps --all --format '{{.Names}}' \
+    ## -f: follow log
+
+errs (er) [<-f>] :: \
+    echo "" > /tmp/docker_err_p; \
+    while [[ true ]]; do \
+        for c in $(docker ps --format '{{.Names}}'); do \
+            docker logs $c 2>&1 | grep "ERROR:" | sed "s/^/$c: /"; \
+        done > /tmp/docker_err_c; \
+        grep -Fxvf /tmp/docker_err_p /tmp/docker_err_c; \
+        mv -f /tmp/docker_err_c /tmp/docker_err_p; \
+        if [[ $1 != -f ]]; then break; fi; \
+        sleep 2; \
+    done
+
+pull container (pu) <container_name> :: \
+    docker pull $1
+
+rename container (mv) <current_name> <new_name> :: \
+    docker rename $1 $2 \
+    !! docker ps --all --format '{{.Names}}'
+
+restart container (re) <container_name> :: \
+    docker restart $1 \
+    !! docker ps --all --format '{{.Names}}'
+
+run container (ru) <source-container-name> <deployed-container-name> [<-p host-port:container-port>] :: \
+    if [[ $3 == -p ]]; then \
+        docker run -d $3 $4 $5 $6 --name $2 $1; \
+    else \
+        docker -d --name $2 $1; \
+    fi
+
+shell (sh) [<-s>] [<-r>] <container_name> :: \
+    tmp_shell=bash; tmp_user=""; \
+    while [[ "$1" != "" ]]; do \
+        case $1 in \
+            -s) tmp_shell=sh;; \
+            -r) tmp_user="--user root";; \
+            *) break;; \
+        esac; \
+        echo $1; shift; \ 
+    done; \
+    docker exec -it $tmp_user $1 $tmp_shell \
+    !! docker ps --all --format '{{.Names}}' \
+    ## bash shell. -s: sh, -r: user root
+
+start container (st) [<-a>] <container_name> :: docker start $1 \
+    !! docker ps --all --format '{{.Names}}'
+
+stats (s) :: docker stats ## Show the CPU, Memory consumption of containers
+
+stop container (so) [<-a>] <container_name> :: \
+    if [[ $1 == -a ]]; then \
+        conts="$(docker ps -q)"; \
+        if [[ "$conts" != "" ]]; then \
+            docker stop $conts; \
+        fi; \
+    else \
+        docker stop $1; \
+    fi \
+    !! docker ps --all --format '{{.Names}}' \
+    ## -a: Stop all containers
+
+# -------------------------------------------------------------------------------------------------
+= COMPOSE
+# -------------------------------------------------------------------------------------------------
+
+compose build (cb) :: \
+    if [[ "$1" == "" ]]; then \
+        docker compose build; \
+    else \
+        docker compose -f $1 build; \
+    fi; \
+    ## Build containers
+
+# docker compose build --no-cache --progress=plain
+
+compose down (cdo) [<service>] :: \
+    if [[ "$1" == "" ]]; then \
+        docker compose down; \
+    else \
+        docker compose -f $1 down; \
+    fi; \
+    ## Stop and remove containers, networks
+
+compose list (cls) :: docker compose ls
+
+compose restart (cre) [<service>] :: \
+    if [[ "$1" == "" ]]; then \
+        docker compose restart; \
+    else \
+        docker compose -f $1 restart; \
+    fi; \
+    ## Restart all containers
+
+compose top (ct) :: docker compose top
+
+compose up (cup) [<service>] :: \
+    if [[ "$1" == "" ]]; then \
+        docker compose up -d; \
+    else \
+        docker compose -f $1 up -d; \
+    fi; \
+    ## Deploy and run containers, networks
+
+compose build up (cbup) [<service>] :: \
+    if [[ "$1" == "" ]]; then \
+        docker compose up -d --build; \
+    else \
+        docker compose -f $1 up -d --build; \
+    fi; \
+    ## Build, deploy and run containers, networks
+
+# -------------------------------------------------------------------------------------------------
+= NETWORKS
+# -------------------------------------------------------------------------------------------------
+
+list networks (ln) :: docker network ls
+
+prune networks (pn) :: docker network prune ## Remove all unused custom networks
+
+remove network (rn) <network-name> :: docker network rm $1 !! docker network ls --format '{{.Name}}'
+
+# -------------------------------------------------------------------------------------------------
+= SYSTEM
+# -------------------------------------------------------------------------------------------------
+
+system prune all (spa) :: \
+    read -p "THIS WILL REMOVE ALL unused containers, images, networks, and build cache (ie containers not created) - Are you sure [yN]? " yn; \
+    if [[ ${yn^} == Y ]]; then \
+        docker system prune -a; \
+    fi \
+    ## Remove ALL unused containers, images, networks, and build cache
+
+# -------------------------------------------------------------------------------------------------
+= VOLUMES
+# -------------------------------------------------------------------------------------------------
+
+volume ls (vls) :: docker volume ls
+
+
+```
+
+## Alias file
+
+```bash
+# Completion function
+_dc_complete() {
+    local cur prev all
+    all=""
+    for ((i = 1; i < ${#COMP_WORDS[@]}; i++)); do
+        word="${COMP_WORDS[i]}"
+        [[ $word != -* ]] && all+="$word "
+    done
+    all="$(echo $all | xargs)"
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev_step=1
+    prev="${COMP_WORDS[COMP_CWORD-$prev_step]}"
+    while [[ "${prev:0:1}" == "-" ]]; do
+        let prev_step=prev_step+1
+        prev="${COMP_WORDS[COMP_CWORD-$prev_step]}"
+    done
+
+        if [[ "$all" == "delete container" || "$prev" == "drm" || "$prev" == "@drm" ]]; then
+            COMPREPLY=( $(compgen -W "$(docker ps --all --format '{{.Names}}')" -- "$cur") )
+        fi
+        if [[ "$all" == "logs" || "$prev" == "dlo" || "$prev" == "@dlo" ]]; then
+            COMPREPLY=( $(compgen -W "$(docker ps --all --format '{{.Names}}' )" -- "$cur") )
+        fi
+        if [[ "$all" == "rename container" || "$prev" == "dmv" || "$prev" == "@dmv" ]]; then
+            COMPREPLY=( $(compgen -W "$(docker ps --all --format '{{.Names}}')" -- "$cur") )
+        fi
+        if [[ "$all" == "restart container" || "$prev" == "dre" || "$prev" == "@dre" ]]; then
+            COMPREPLY=( $(compgen -W "$(docker ps --all --format '{{.Names}}')" -- "$cur") )
+        fi
+        if [[ "$all" == "shell" || "$prev" == "dsh" || "$prev" == "@dsh" ]]; then
+            COMPREPLY=( $(compgen -W "$(docker ps --all --format '{{.Names}}' )" -- "$cur") )
+        fi
+        if [[ "$all" == "start container" || "$prev" == "dst" || "$prev" == "@dst" ]]; then
+            COMPREPLY=( $(compgen -W "$(docker ps --all --format '{{.Names}}')" -- "$cur") )
+        fi
+        if [[ "$all" == "stop container" || "$prev" == "dso" || "$prev" == "@dso" ]]; then
+            COMPREPLY=( $(compgen -W "$(docker ps --all --format '{{.Names}}' )" -- "$cur") )
+        fi
+        if [[ "$all" == "remove network" || "$prev" == "drn" || "$prev" == "@drn" ]]; then
+            COMPREPLY=( $(compgen -W "$(docker network ls --format '{{.Name}}')" -- "$cur") )
+        fi
+}
+complete -F _dc_complete dc @dhe @dli @drm @dps @dlo @der @dpu @dmv @dre @dru @dsh @dst @ds @dso @dcb @dcdo @dcls @dcre @dct @dcup @dcbup @dln @dpn @drn @dspa @dvls
+
+# Shortcut aliases
+alias @dhe='dc dhe'
+alias @dli='dc dli'
+alias @drm='dc drm'
+alias @dps='dc dps'
+alias @dlo='dc dlo'
+alias @der='dc der'
+alias @dpu='dc dpu'
+alias @dmv='dc dmv'
+alias @dre='dc dre'
+alias @dru='dc dru'
+alias @dsh='dc dsh'
+alias @dst='dc dst'
+alias @ds='dc ds'
+alias @dso='dc dso'
+alias @dcb='dc dcb'
+alias @dcdo='dc dcdo'
+alias @dcls='dc dcls'
+alias @dcre='dc dcre'
+alias @dct='dc dct'
+alias @dcup='dc dcup'
+alias @dcbup='dc dcbup'
+alias @dln='dc dln'
+alias @dpn='dc dpn'
+alias @drn='dc drn'
+alias @dspa='dc dspa'
+alias @dvls='dc dvls'
+```
+
+## Bash script
+
+```bash
+#!/usr/bin/env bash
+debug_yn=n
+[[ "$1" == "-d" ]] && { debug_yn=y; shift; }
+[[ "${CLI_DEBUG^^}" == "TRUE" ]] && debug_yn=y
+
+C_CYA="\x1b[96m" C_GRE="\x1b[92m" C_MAG="\x1b[95m" C_WHI="\x1b[97m" C_DEF="\x1b[0m"
+
+# param 1 - actual number of parameters
+# param 2 - required number of parameters
+# param 3 - incorrect parameters message
+check_params() {
+  [[ "$1" < "$2" ]] && { echo -e "$3"; exit; }
+}
+
+print_command() {
+  [[ $debug_yn == y ]] && { echo "COMMAND: $*" | sed 's/"/\"/g'; echo "COMMAND: $*" | sed 's/./-/g'; }
+}
+section="HELP"
+
+if [[ "$1" == "help" || "$1" == "dhe" ]]; then
+   [[ "$1" == "dhe" ]] && shift || shift 1
+   usage="\x1b[95mhelp \x1b[96m(dhe)\x1b[97m [filter]\x1b[92m # Show help, optionally filtered by pattern\x1b[0m"
+   check_params $# 0 "Usage: $usage"
+   
+echo -e "\x1b[95mgenerated:2026-07-14 10:39\x1b[0m"
+echo
+filter="$1"
+if [[ -n "$filter" ]]; then
+  # Show all section headers but only matching commands
+  while IFS= read -r line; do
+    if [[ "$line" =~ ^section= ]]; then
+      # Always show section headers
+      echo -e "\x1b[92m${line#section=}\x1b[0m"
+    elif [[ "$line" =~ usage= ]]; then
+      # Show command if it matches the filter
+      cmd_line="${line#*usage=}"
+      if echo "$cmd_line" | grep -iq "$filter"; then
+        echo -e "   $cmd_line"
+      fi
+    fi
+  done < <(egrep "^section=|^   usage=" "$0" | sed 's/\"//g')
+else
+  # Show everything
+  while IFS= read -r line; do echo -e "${line}${CRESET}"; done < <(egrep "^section=|^   usage=" "$0" | sed "s/.*usage=/   /; s/.*section=/\x1b[92m/; s/\"//g")
+fi
+   exit
+fi
+section="IMAGES"
+
+if [[ "$1 $2" == "list images" || "$1" == "dli" ]]; then
+   [[ "$1" == "dli" ]] && shift || shift 2
+   usage="\x1b[95mlist images \x1b[96m(dli)\x1b[97m [name]\x1b[92m # Use % or * as wildcards\x1b[0m"
+   check_params $# 0 "Usage: $usage"
+   print_command " if [[ \"$1\" == \"\" ]]; then docker images; else filter=\"${1//\*/.\*}\"; filter=\"${filter//%/.\*}\"; docker images 2>/dev/null | egrep \"^$filter .*|IMAGE\"; fi"
+   if [[ "$1" == "" ]]; then docker images; else filter="${1//\*/.\*}"; filter="${filter//%/.\*}"; docker images 2>/dev/null | egrep "^$filter .*|IMAGE"; fi
+   exit
+fi
+section="CONTAINERS"
+
+if [[ "$1 $2" == "delete container" || "$1" == "drm" ]]; then
+   [[ "$1" == "drm" ]] && shift || shift 2
+   usage="\x1b[95mdelete container \x1b[96m(drm)\x1b[97m <container_name>\x1b[0m"
+   check_params $# 1 "Usage: $usage"
+   print_command " read -p \"Are you sure [yN]? \" yn; if [[ ${yn^} == Y ]]; then docker rm $1; fi"
+   read -p "Are you sure [yN]? " yn; if [[ ${yn^} == Y ]]; then docker rm $1; fi
+   exit
+fi
+
+if [[ "$1 $2" == "list containers" || "$1" == "dps" ]]; then
+   [[ "$1" == "dps" ]] && shift || shift 2
+   usage="\x1b[95mlist containers \x1b[96m(dps)\x1b[97m [-d]\x1b[92m # -d: show details\x1b[0m"
+   check_params $# 0 "Usage: $usage"
+   print_command " if [[ $1 == -d ]]; then docker ps --all; else tmp=\"$(docker ps --all --format 'table {{.ID}}\t{{.Names}}\t{{.Status}}\t{{.Size}}')\"; echo \"$tmp\" | head -n1; echo \"$tmp\" | tail -n+2 | grep 'Up [0-9]* min' | sort -k2,2; echo \"$tmp\" | tail -n+2 | grep -v 'Up [0-9]* min' | sort -k 2,2; fi"
+   if [[ $1 == -d ]]; then docker ps --all; else tmp="$(docker ps --all --format 'table {{.ID}}\t{{.Names}}\t{{.Status}}\t{{.Size}}')"; echo "$tmp" | head -n1; echo "$tmp" | tail -n+2 | grep 'Up [0-9]* min' | sort -k2,2; echo "$tmp" | tail -n+2 | grep -v 'Up [0-9]* min' | sort -k 2,2; fi
+   exit
+fi
+
+if [[ "$1" == "logs" || "$1" == "dlo" ]]; then
+   [[ "$1" == "dlo" ]] && shift || shift 1
+   usage="\x1b[95mlogs \x1b[96m(dlo)\x1b[97m [-f] <container-name>\x1b[92m # -f: follow log\x1b[0m"
+   check_params $# 1 "Usage: $usage"
+   print_command " if [[ $1 == -f ]]; then docker logs -f $2; else docker logs $1; fi"
+   if [[ $1 == -f ]]; then docker logs -f $2; else docker logs $1; fi
+   exit
+fi
+
+if [[ "$1" == "errs" || "$1" == "der" ]]; then
+   [[ "$1" == "der" ]] && shift || shift 1
+   usage="\x1b[95merrs \x1b[96m(der)\x1b[97m [-f]\x1b[0m"
+   check_params $# 0 "Usage: $usage"
+   print_command " echo \"\" > /tmp/docker_err_p; while [[ true ]]; do for c in $(docker ps --format '{{.Names}}'); do docker logs $c 2>&1 | grep \"ERROR:\" | sed \"s/^/$c: /\"; done > /tmp/docker_err_c; grep -Fxvf /tmp/docker_err_p /tmp/docker_err_c; mv -f /tmp/docker_err_c /tmp/docker_err_p; if [[ $1 != -f ]]; then break; fi; sleep 2; done"
+   echo "" > /tmp/docker_err_p; while [[ true ]]; do for c in $(docker ps --format '{{.Names}}'); do docker logs $c 2>&1 | grep "ERROR:" | sed "s/^/$c: /"; done > /tmp/docker_err_c; grep -Fxvf /tmp/docker_err_p /tmp/docker_err_c; mv -f /tmp/docker_err_c /tmp/docker_err_p; if [[ $1 != -f ]]; then break; fi; sleep 2; done
+   exit
+fi
+
+if [[ "$1 $2" == "pull container" || "$1" == "dpu" ]]; then
+   [[ "$1" == "dpu" ]] && shift || shift 2
+   usage="\x1b[95mpull container \x1b[96m(dpu)\x1b[97m <container_name>\x1b[0m"
+   check_params $# 1 "Usage: $usage"
+   print_command " docker pull $1"
+   docker pull $1
+   exit
+fi
+
+if [[ "$1 $2" == "rename container" || "$1" == "dmv" ]]; then
+   [[ "$1" == "dmv" ]] && shift || shift 2
+   usage="\x1b[95mrename container \x1b[96m(dmv)\x1b[97m <current_name> <new_name>\x1b[0m"
+   check_params $# 2 "Usage: $usage"
+   print_command " docker rename $1 $2"
+   docker rename $1 $2
+   exit
+fi
+
+if [[ "$1 $2" == "restart container" || "$1" == "dre" ]]; then
+   [[ "$1" == "dre" ]] && shift || shift 2
+   usage="\x1b[95mrestart container \x1b[96m(dre)\x1b[97m <container_name>\x1b[0m"
+   check_params $# 1 "Usage: $usage"
+   print_command " docker restart $1"
+   docker restart $1
+   exit
+fi
+
+if [[ "$1 $2" == "run container" || "$1" == "dru" ]]; then
+   [[ "$1" == "dru" ]] && shift || shift 2
+   usage="\x1b[95mrun container \x1b[96m(dru)\x1b[97m <source-container-name> <deployed-container-name> [-p host-port:container-port]\x1b[0m"
+   check_params $# 2 "Usage: $usage"
+   print_command " if [[ $3 == -p ]]; then docker run -d $3 $4 $5 $6 --name $2 $1; else docker -d --name $2 $1; fi"
+   if [[ $3 == -p ]]; then docker run -d $3 $4 $5 $6 --name $2 $1; else docker -d --name $2 $1; fi
+   exit
+fi
+
+if [[ "$1" == "shell" || "$1" == "dsh" ]]; then
+   [[ "$1" == "dsh" ]] && shift || shift 1
+   usage="\x1b[95mshell \x1b[96m(dsh)\x1b[97m [-s] [-r] <container_name>\x1b[92m # bash shell. -s: sh, -r: user root\x1b[0m"
+   check_params $# 1 "Usage: $usage"
+   print_command " tmp_shell=bash; tmp_user=\"\"; while [[ \"$1\" != \"\" ]]; do case $1 in -s) tmp_shell=sh;; -r) tmp_user=\"--user root\";; *) break;; esac; echo $1; shift; done; docker exec -it $tmp_user $1 $tmp_shell"
+   tmp_shell=bash; tmp_user=""; while [[ "$1" != "" ]]; do case $1 in -s) tmp_shell=sh;; -r) tmp_user="--user root";; *) break;; esac; echo $1; shift; done; docker exec -it $tmp_user $1 $tmp_shell
+   exit
+fi
+
+if [[ "$1 $2" == "start container" || "$1" == "dst" ]]; then
+   [[ "$1" == "dst" ]] && shift || shift 2
+   usage="\x1b[95mstart container \x1b[96m(dst)\x1b[97m [-a] <container_name>\x1b[0m"
+   check_params $# 1 "Usage: $usage"
+   print_command " docker start $1"
+   docker start $1
+   exit
+fi
+
+if [[ "$1" == "stats" || "$1" == "ds" ]]; then
+   [[ "$1" == "ds" ]] && shift || shift 1
+   usage="\x1b[95mstats \x1b[96m(ds)\x1b[97m\x1b[92m # Show the CPU, Memory consumption of containers\x1b[0m"
+   check_params $# 0 "Usage: $usage"
+   print_command " docker stats"
+   docker stats
+   exit
+fi
+
+if [[ "$1 $2" == "stop container" || "$1" == "dso" ]]; then
+   [[ "$1" == "dso" ]] && shift || shift 2
+   usage="\x1b[95mstop container \x1b[96m(dso)\x1b[97m [-a] <container_name>\x1b[92m # -a: Stop all containers\x1b[0m"
+   check_params $# 1 "Usage: $usage"
+   print_command " if [[ $1 == -a ]]; then conts=\"$(docker ps -q)\"; if [[ \"$conts\" != \"\" ]]; then docker stop $conts; fi; else docker stop $1; fi"
+   if [[ $1 == -a ]]; then conts="$(docker ps -q)"; if [[ "$conts" != "" ]]; then docker stop $conts; fi; else docker stop $1; fi
+   exit
+fi
+section="COMPOSE"
+
+if [[ "$1 $2" == "compose build" || "$1" == "dcb" ]]; then
+   [[ "$1" == "dcb" ]] && shift || shift 2
+   usage="\x1b[95mcompose build \x1b[96m(dcb)\x1b[97m\x1b[92m # Build containers\x1b[0m"
+   check_params $# 0 "Usage: $usage"
+   print_command " if [[ \"$1\" == \"\" ]]; then docker compose build; else docker compose -f $1 build; fi;"
+   if [[ "$1" == "" ]]; then docker compose build; else docker compose -f $1 build; fi;
+   exit
+fi
+
+if [[ "$1 $2" == "compose down" || "$1" == "dcdo" ]]; then
+   [[ "$1" == "dcdo" ]] && shift || shift 2
+   usage="\x1b[95mcompose down \x1b[96m(dcdo)\x1b[97m [service]\x1b[92m # Stop and remove containers, networks\x1b[0m"
+   check_params $# 0 "Usage: $usage"
+   print_command " if [[ \"$1\" == \"\" ]]; then docker compose down; else docker compose -f $1 down; fi;"
+   if [[ "$1" == "" ]]; then docker compose down; else docker compose -f $1 down; fi;
+   exit
+fi
+
+if [[ "$1 $2" == "compose list" || "$1" == "dcls" ]]; then
+   [[ "$1" == "dcls" ]] && shift || shift 2
+   usage="\x1b[95mcompose list \x1b[96m(dcls)\x1b[97m\x1b[0m"
+   check_params $# 0 "Usage: $usage"
+   print_command " docker compose ls"
+   docker compose ls
+   exit
+fi
+
+if [[ "$1 $2" == "compose restart" || "$1" == "dcre" ]]; then
+   [[ "$1" == "dcre" ]] && shift || shift 2
+   usage="\x1b[95mcompose restart \x1b[96m(dcre)\x1b[97m [service]\x1b[92m # Restart all containers\x1b[0m"
+   check_params $# 0 "Usage: $usage"
+   print_command " if [[ \"$1\" == \"\" ]]; then docker compose restart; else docker compose -f $1 restart; fi;"
+   if [[ "$1" == "" ]]; then docker compose restart; else docker compose -f $1 restart; fi;
+   exit
+fi
+
+if [[ "$1 $2" == "compose top" || "$1" == "dct" ]]; then
+   [[ "$1" == "dct" ]] && shift || shift 2
+   usage="\x1b[95mcompose top \x1b[96m(dct)\x1b[97m\x1b[0m"
+   check_params $# 0 "Usage: $usage"
+   print_command " docker compose top"
+   docker compose top
+   exit
+fi
+
+if [[ "$1 $2" == "compose up" || "$1" == "dcup" ]]; then
+   [[ "$1" == "dcup" ]] && shift || shift 2
+   usage="\x1b[95mcompose up \x1b[96m(dcup)\x1b[97m [service]\x1b[92m # Deploy and run containers, networks\x1b[0m"
+   check_params $# 0 "Usage: $usage"
+   print_command " if [[ \"$1\" == \"\" ]]; then docker compose up -d; else docker compose -f $1 up -d; fi;"
+   if [[ "$1" == "" ]]; then docker compose up -d; else docker compose -f $1 up -d; fi;
+   exit
+fi
+
+if [[ "$1 $2 $3" == "compose build up" || "$1" == "dcbup" ]]; then
+   [[ "$1" == "dcbup" ]] && shift || shift 3
+   usage="\x1b[95mcompose build up \x1b[96m(dcbup)\x1b[97m [service]\x1b[92m # Build, deploy and run containers, networks\x1b[0m"
+   check_params $# 0 "Usage: $usage"
+   print_command " if [[ \"$1\" == \"\" ]]; then docker compose up -d --build; else docker compose -f $1 up -d --build; fi;"
+   if [[ "$1" == "" ]]; then docker compose up -d --build; else docker compose -f $1 up -d --build; fi;
+   exit
+fi
+section="NETWORKS"
+
+if [[ "$1 $2" == "list networks" || "$1" == "dln" ]]; then
+   [[ "$1" == "dln" ]] && shift || shift 2
+   usage="\x1b[95mlist networks \x1b[96m(dln)\x1b[97m\x1b[0m"
+   check_params $# 0 "Usage: $usage"
+   print_command " docker network ls"
+   docker network ls
+   exit
+fi
+
+if [[ "$1 $2" == "prune networks" || "$1" == "dpn" ]]; then
+   [[ "$1" == "dpn" ]] && shift || shift 2
+   usage="\x1b[95mprune networks \x1b[96m(dpn)\x1b[97m\x1b[92m # Remove all unused custom networks\x1b[0m"
+   check_params $# 0 "Usage: $usage"
+   print_command " docker network prune"
+   docker network prune
+   exit
+fi
+
+if [[ "$1 $2" == "remove network" || "$1" == "drn" ]]; then
+   [[ "$1" == "drn" ]] && shift || shift 2
+   usage="\x1b[95mremove network \x1b[96m(drn)\x1b[97m <network-name>\x1b[0m"
+   check_params $# 1 "Usage: $usage"
+   print_command " docker network rm $1"
+   docker network rm $1
+   exit
+fi
+section="SYSTEM"
+
+if [[ "$1 $2 $3" == "system prune all" || "$1" == "dspa" ]]; then
+   [[ "$1" == "dspa" ]] && shift || shift 3
+   usage="\x1b[95msystem prune all \x1b[96m(dspa)\x1b[97m\x1b[92m # Remove ALL unused containers, images, networks, and build cache\x1b[0m"
+   check_params $# 0 "Usage: $usage"
+   print_command " read -p \"THIS WILL REMOVE ALL unused containers, images, networks, and build cache (ie containers not created) - Are you sure [yN]? \" yn; if [[ ${yn^} == Y ]]; then docker system prune -a; fi"
+   read -p "THIS WILL REMOVE ALL unused containers, images, networks, and build cache (ie containers not created) - Are you sure [yN]? " yn; if [[ ${yn^} == Y ]]; then docker system prune -a; fi
+   exit
+fi
+section="VOLUMES"
+
+if [[ "$1 $2" == "volume ls" || "$1" == "dvls" ]]; then
+   [[ "$1" == "dvls" ]] && shift || shift 2
+   usage="\x1b[95mvolume ls \x1b[96m(dvls)\x1b[97m\x1b[0m"
+   check_params $# 0 "Usage: $usage"
+   print_command " docker volume ls"
+   docker volume ls
+   exit
+fi
+
+if [[ "$1" == "" ]]; then
+  echo "No option passed"
+else
+  echo "$*: invalid option"
+fi
+echo "Try "dc help" for more information."
+```

@@ -1,0 +1,1 @@
+start gvim %1 

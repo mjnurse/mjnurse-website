@@ -1,0 +1,219 @@
+---
+title: @ GCloud (GCP) CLI
+---
+## Definition file `gc.def`
+
+```bash
+@ GCloud (GCP)
+
+cmd if [[ "$GCP_PROJECT" != "" ]]; then GCP_PROJECT="--project $GCP_PROJECT"; fi
+
+cmd gc() { \
+    echo PROJ: $GCP_PROJECT; \
+    gcloud "$@" $GCP_PROJECT; \
+}
+
+# --------------------------------------------------------------------------------
+= Config
+# --------------------------------------------------------------------------------
+
+auth login (al) :: gcloud auth login --no-launch-browser \
+    ## auth login with --no-launch-browser
+
+config list (cl) :: gcloud config list
+
+# --------------------------------------------------------------------------------
+= Projects
+# --------------------------------------------------------------------------------
+
+project get (pg) :: gcloud config get project
+
+project list (pl) :: gcloud projects list
+
+project set (ps) :: \
+    echo "Available GCP Projects:" && \
+    gcloud projects list --format="table[no-heading](projectId,name)" | \
+    awk '{printf "%d. %s (%s)\n", NR, $1, substr($0, index($0,$2))}' | \
+    tee /tmp/projects.txt && \
+    read -p $'\nEnter project number: ' num && \
+    project=$(sed -n "${num}p" /tmp/projects.txt | awk '{print $2}') && \
+    gcloud config set project "$project" && \
+    echo "Project set to: $project"
+
+# --------------------------------------------------------------------------------
+= Compute Engine (GCE)
+# --------------------------------------------------------------------------------
+
+compute instances list (cil) :: gc compute instances list 
+
+# --------------------------------------------------------------------------------
+= Kubernetes/Containers
+# --------------------------------------------------------------------------------
+
+kube clusters list (kcl) :: gcloud container clusters list```
+
+## Alias file
+
+```bash
+# Completion function
+_gc_complete() {
+    local cur prev all
+    all=""
+    for ((i = 1; i < ${#COMP_WORDS[@]}; i++)); do
+        word="${COMP_WORDS[i]}"
+        [[ $word != -* ]] && all+="$word "
+    done
+    all="$(echo $all | xargs)"
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev_step=1
+    prev="${COMP_WORDS[COMP_CWORD-$prev_step]}"
+    while [[ "${prev:0:1}" == "-" ]]; do
+        let prev_step=prev_step+1
+        prev="${COMP_WORDS[COMP_CWORD-$prev_step]}"
+    done
+
+}
+complete -F _gc_complete gc @ghe @gal @gcl @gpg @gpl @gps @gcil @gkcl
+
+# Shortcut aliases
+alias @ghe='gc ghe'
+alias @gal='gc gal'
+alias @gcl='gc gcl'
+alias @gpg='gc gpg'
+alias @gpl='gc gpl'
+alias @gps='gc gps'
+alias @gcil='gc gcil'
+alias @gkcl='gc gkcl'
+```
+
+## Bash script
+
+```bash
+#!/usr/bin/env bash
+debug_yn=n
+[[ "$1" == "-d" ]] && { debug_yn=y; shift; }
+[[ "${CLI_DEBUG^^}" == "TRUE" ]] && debug_yn=y
+
+C_CYA="\x1b[96m" C_GRE="\x1b[92m" C_MAG="\x1b[95m" C_WHI="\x1b[97m" C_DEF="\x1b[0m"
+
+# param 1 - actual number of parameters
+# param 2 - required number of parameters
+# param 3 - incorrect parameters message
+check_params() {
+  [[ "$1" < "$2" ]] && { echo -e "$3"; exit; }
+}
+
+print_command() {
+  [[ $debug_yn == y ]] && { echo "COMMAND: $*" | sed 's/"/\"/g'; echo "COMMAND: $*" | sed 's/./-/g'; }
+}
+section="HELP"
+
+if [[ "$1" == "help" || "$1" == "ghe" ]]; then
+   [[ "$1" == "ghe" ]] && shift || shift 1
+   usage="\x1b[95mhelp \x1b[96m(ghe)\x1b[97m [filter]\x1b[92m # Show help, optionally filtered by pattern\x1b[0m"
+   check_params $# 0 "Usage: $usage"
+   
+echo -e "\x1b[92m------------\x1b[0m"
+echo -e "\x1b[92mGCloud (GCP)\x1b[0m"
+echo -e "\x1b[92m------------\x1b[0m"
+
+echo -e "\x1b[95mgenerated:2026-07-29 09:22\x1b[0m"
+echo
+filter="$1"
+if [[ -n "$filter" ]]; then
+  # Show all section headers but only matching commands
+  while IFS= read -r line; do
+    if [[ "$line" =~ ^section= ]]; then
+      # Always show section headers
+      echo -e "\x1b[92m${line#section=}\x1b[0m"
+    elif [[ "$line" =~ usage= ]]; then
+      # Show command if it matches the filter
+      cmd_line="${line#*usage=}"
+      if echo "$cmd_line" | grep -iq "$filter"; then
+        echo -e "   $cmd_line"
+      fi
+    fi
+  done < <(egrep "^section=|^   usage=" "$0" | sed 's/\"//g')
+else
+  # Show everything
+  while IFS= read -r line; do echo -e "${line}${CRESET}"; done < <(egrep "^section=|^   usage=" "$0" | sed "s/.*usage=/   /; s/.*section=/\x1b[92m/; s/\"//g")
+fi
+   exit
+fi
+if [[ "$GCP_PROJECT" != "" ]]; then GCP_PROJECT="--project $GCP_PROJECT"; fi
+gc() { echo PROJ: $GCP_PROJECT; gcloud "$@" $GCP_PROJECT; }
+section="Config"
+
+if [[ "$1 $2" == "auth login" || "$1" == "gal" ]]; then
+   [[ "$1" == "gal" ]] && shift || shift 2
+   usage="\x1b[95mauth login \x1b[96m(gal)\x1b[97m\x1b[92m # auth login with --no-launch-browser\x1b[0m"
+   check_params $# 0 "Usage: $usage"
+   print_command " gcloud auth login --no-launch-browser"
+   gcloud auth login --no-launch-browser
+   exit
+fi
+
+if [[ "$1 $2" == "config list" || "$1" == "gcl" ]]; then
+   [[ "$1" == "gcl" ]] && shift || shift 2
+   usage="\x1b[95mconfig list \x1b[96m(gcl)\x1b[97m\x1b[0m"
+   check_params $# 0 "Usage: $usage"
+   print_command " gcloud config list"
+   gcloud config list
+   exit
+fi
+section="Projects"
+
+if [[ "$1 $2" == "project get" || "$1" == "gpg" ]]; then
+   [[ "$1" == "gpg" ]] && shift || shift 2
+   usage="\x1b[95mproject get \x1b[96m(gpg)\x1b[97m\x1b[0m"
+   check_params $# 0 "Usage: $usage"
+   print_command " gcloud config get project"
+   gcloud config get project
+   exit
+fi
+
+if [[ "$1 $2" == "project list" || "$1" == "gpl" ]]; then
+   [[ "$1" == "gpl" ]] && shift || shift 2
+   usage="\x1b[95mproject list \x1b[96m(gpl)\x1b[97m\x1b[0m"
+   check_params $# 0 "Usage: $usage"
+   print_command " gcloud projects list"
+   gcloud projects list
+   exit
+fi
+
+if [[ "$1 $2" == "project set" || "$1" == "gps" ]]; then
+   [[ "$1" == "gps" ]] && shift || shift 2
+   usage="\x1b[95mproject set \x1b[96m(gps)\x1b[97m\x1b[0m"
+   check_params $# 0 "Usage: $usage"
+   print_command " echo \"Available GCP Projects:\" && gcloud projects list --format=\"table[no-heading](projectId,name)\" | awk '{printf \"%d. %s (%s)\n\", NR, $1, substr($0, index($0,$2))}' | tee /tmp/projects.txt && read -p $'\nEnter project number: ' num && project=$(sed -n \"${num}p\" /tmp/projects.txt | awk '{print $2}') && gcloud config set project \"$project\" && echo \"Project set to: $project\""
+   echo "Available GCP Projects:" && gcloud projects list --format="table[no-heading](projectId,name)" | awk '{printf "%d. %s (%s)\n", NR, $1, substr($0, index($0,$2))}' | tee /tmp/projects.txt && read -p $'\nEnter project number: ' num && project=$(sed -n "${num}p" /tmp/projects.txt | awk '{print $2}') && gcloud config set project "$project" && echo "Project set to: $project"
+   exit
+fi
+section="Compute Engine (GCE)"
+
+if [[ "$1 $2 $3" == "compute instances list" || "$1" == "gcil" ]]; then
+   [[ "$1" == "gcil" ]] && shift || shift 3
+   usage="\x1b[95mcompute instances list \x1b[96m(gcil)\x1b[97m\x1b[0m"
+   check_params $# 0 "Usage: $usage"
+   print_command " gc compute instances list"
+   gc compute instances list
+   exit
+fi
+section="Kubernetes/Containers"
+
+if [[ "$1 $2 $3" == "kube clusters list" || "$1" == "gkcl" ]]; then
+   [[ "$1" == "gkcl" ]] && shift || shift 3
+   usage="\x1b[95mkube clusters list \x1b[96m(gkcl)\x1b[97m\x1b[0m"
+   check_params $# 0 "Usage: $usage"
+   print_command " gcloud container clusters list"
+   gcloud container clusters list
+   exit
+fi
+
+if [[ "$1" == "" ]]; then
+  echo "No option passed"
+else
+  echo "$*: invalid option"
+fi
+echo "Try "gc help" for more information."
+```

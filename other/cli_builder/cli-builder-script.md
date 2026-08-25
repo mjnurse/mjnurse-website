@@ -1,0 +1,477 @@
+---
+title: CLI builder Script
+---
+
+This Python script generates a cli (command line interface) bash script from a
+definition file.  The structure of the definition file is code header below. 
+This script also generates an alias file which contains a set of alias
+commands which run each command in the definition file using the associated
+shortcut prepended with an '@'.
+
+```bash
+#!/usr/bin/env python3
+"""CLI Builder - Generate bash CLI scripts from definition files"""
+from datetime import datetime
+import re, sys, os
+from dataclasses import dataclass
+from typing import List, Optional
+
+C_CYA="\\x1b[96m" 
+C_GRE="\\x1b[92m" 
+C_MAG="\\x1b[95m"
+C_WHI="\\x1b[97m" 
+C_DEF="\\x1b[0m"
+
+HELP_TEXT = r"""
+NAME
+  cli-builder - Generate CLI bash scripts from definition files.
+
+USAGE
+  cli-builder [-d] <definition_filename>
+
+OPTIONS
+  -d          Run in debug mode
+  -h, --help  Show this help
+
+DESCRIPTION
+  This python script generates a cli (command line interface) bash script from a definition file.
+  The structure of the definition file is described below.  This script also generates an alias
+  file which contains a set of alias commands which run each command in the definition file using
+  the associated shortcut prepended with an '@'.
+
+  Definition File Structure
+  -------------------------
+
+  # - a line starting with a # is a comment
+
+  = - a line starting with a = is a group description for the set of commands following this
+      line up until the next line starting with a = or the end of the file.
+
+  !! - commands following !! are command line completion commands.  The command must return a list of
+        words which are used to complete the command.  The command is run when the current or
+        previous word matches the command name or shortcut.
+
+  ## - text following ## is a help description for the command.  This text is shown when
+        the help command is run.
+
+  @ - a line starting with @ followed by a space sets the title for the cli.  The title is shown
+      at the top of the help output.
+
+  @@ - a line starting with @@ followed by a space is a description for the cli.  If the
+       description spans multiple lines, each line must start with @@.  The description is shown
+       below the title in the help output.
+
+  aliasLeadChars: - sets the leading character(s) for generated aliases (default: first char of
+                    definition filename).  For example, 'aliasLeadChars: es' will generate aliases
+                    like @esli, @essi instead of @eli, @esi.
+
+  ( \ - is the line continuation character.  Any line ending \ is joined to the next line. )
+
+  All other lines in the file are command definitions.  These lines are structured as follows:
+
+  name-1..name-n (shortcut) <param> [<opt_param] :: command \$1 \$2
+
+  Where:
+
+  name-1..name-n
+    A list of words which describe the command and which are typed to run the command.
+
+  shortcut
+    A single word which can also be typed to run the command.  If the aliases are created
+    then the alias can also be run direct from the command as @alias.
+
+  param
+    A mandatory parameter.  There can be 0 or more mandatory parameters.
+
+  opt_param
+    A optional parameter.  There can me 0 or more optional parameters.  The must always follow
+    the mandatory parameters and there can be no gaps.  This means if optional parameter 3 is
+    passed in so must optional parameters 1 and 2.
+
+  ::
+    Separates the command definition with the Linux command that is run.
+
+  command
+    Is an Linux command.  Parameter values entered after the command are specified using there
+    position preceded by a \$.  e.g \$1, \$2.
+
+  Example
+
+  sort_cli.def:
+  ----------------------------------------------------------------
+  # FILE OPTIONS
+  sort file (sf) <filename> <sort_parameter> :: cat \$1 | sort \$2
+  ----------------------------------------------------------------
+
+  This example sorts a file specified by a mandatory filename.  An optional sort parameter can
+  be passed to modify the sort order.  Once the cli is built the command can be run as follows.
+  Note: the name of the cli command is the same as the name of the definition file
+  (without the .def).
+
+  > sort_cli sort file my_file
+
+  > sort_cli sf my_file --ignore_case
+
+  > @sf my_file
+
+AUTHOR
+  mjnurse - 2025
+"""
+
+@dataclass
+class Cmd:
+    """Represents a CLI command"""
+    keys: List[str]
+    shortcut: str
+    params: List[tuple[str, bool]]  # (name, is_optional)
+    cmd: str
+    help: str
+    comp: str
+
+    @property
+    def all_keys(self): return ' '.join(self.keys)
+
+    @property
+    def num_mandatory(self): return sum(1 for _, opt in self.params if not opt)
+
+    @property
+    def usage_str(self):
+        params_str = ' '.join(f'[{p}]' if opt else f'<{p}>' for p, opt in self.params)
+        return f"{self.all_keys} ({self.shortcut}) {params_str}".strip()
+
+    @property
+    def opt_params(self):
+        return [p for p, opt in self.params if opt]
+
+def parse_def(lines, title, description, cli_name, alias_lead_chars):
+    """Parse definition file into commands and groups"""
+    group = ""
+    cmds = []
+    title_str = ""
+
+    if title:
+        title_str = f'''
+echo -e "{C_GRE}{"-"*len(title)}{C_DEF}"
+echo -e "{C_GRE}{title}{C_DEF}"
+echo -e "{C_GRE}{"-"*len(title)}{C_DEF}"
+'''
+    if description:
+        desc_lines = '\n'.join(f'echo -e "{C_WHI}{line}{C_DEF}"' for line in description)
+        title_str += f'''
+{desc_lines}
+'''
+    title_str += f'''
+echo -e "{C_MAG}generated:{datetime.now().strftime('%Y-%m-%d %H:%M')}{C_DEF}"
+echo
+'''
+
+    cmds.append(('cmd', Cmd(
+            keys=['help'],
+            shortcut=alias_lead_chars + 'he',
+            params=[('filter', True)],
+            cmd=title_str + f'''filter="$1"
+if [[ -n "$filter" ]]; then
+  # Show all section headers but only matching commands
+  while IFS= read -r line; do
+    if [[ "$line" =~ ^section= ]]; then
+      # Always show section headers
+      echo -e "\\x1b[92m${{line#section=}}\\x1b[0m"
+    elif [[ "$line" =~ usage= ]]; then
+      # Show command if it matches the filter
+      cmd_line="${{line#*usage=}}"
+      if echo "$cmd_line" | grep -iq "$filter"; then
+        echo -e "   $cmd_line"
+      fi
+    fi
+  done < <(egrep "^section=|^   usage=" "$0" | sed 's/\\"//g')
+else
+  # Show everything
+  while IFS= read -r line; do echo -e "${{line}}${{CRESET}}"; done < <(egrep "^section=|^   usage=" "$0" | sed "s/.*usage=/   /; s/.*section=/\\x1b[92m/; s/\\"//g")
+fi''',
+            help='Show help, optionally filtered by pattern',
+            comp=''
+        ), 'HELP'))
+
+    for line in (l.strip() for l in lines):
+        # Skip comments and empty lines
+        if not line or line.startswith('#'):
+            continue
+            
+        # Group description
+        if line.startswith('='):
+            group = line[2:]
+            continue
+        
+        # Direct command insertion
+        if line.startswith('cmd '):
+            cmds.append(('raw', line[4:]))
+            continue
+            
+        # Command definition
+        if '::' not in line:
+            continue
+            
+        # Extract parts
+        help_txt = re.search(r'##\s*(.+)', line)
+        comp_cmd = re.search(r'!!\s*([^#]+)', line)
+        line = re.sub(r'##.*|!!.*', '', line)
+        
+        defn, cmd = (s.strip() for s in line.split('::', 1))
+
+        if cmd == '':
+            print(f'Warning: Command missing for definition: {defn}\n')
+        
+        # Parse command definition
+        tokens = re.findall(r'\w+|\([^)]+\)|<[^>]+>|\[[^\]]+\]', defn)
+        keys, params, shortcut = [], [], ''
+
+        for tok in tokens:
+            if tok.startswith('('):
+                shortcut = alias_lead_chars + tok.strip('()')
+            elif tok.startswith('['):
+                params.append((tok.strip('[]<>'), True))
+            elif tok.startswith('<'):
+                params.append((tok.strip('<>'), False))
+            else:
+                keys.append(tok)
+
+        # Auto-generate shortcut if not provided
+        if not shortcut:
+            shortcut = alias_lead_chars + ''.join(k[0] for k in keys[:2])
+
+        cmds.append(('cmd', Cmd(
+            keys=keys,
+            shortcut=shortcut,
+            params=params,
+            cmd=cmd,
+            help=help_txt.group(1) if help_txt else '',
+            comp=comp_cmd.group(1) if comp_cmd else ''
+        ), group))
+    
+    return cmds
+
+def gen_script(cli_name, cmds, debug=False):
+    """Generate bash CLI script"""
+
+    script = f'''#!/usr/bin/env bash
+debug_yn=n
+[[ "$1" == "-d" ]] && {{ debug_yn=y; shift; }}
+[[ "${{CLI_DEBUG^^}}" == "TRUE" ]] && debug_yn=y
+
+C_CYA="{C_CYA}" C_GRE="{C_GRE}" C_MAG="{C_MAG}" C_WHI="{C_WHI}" C_DEF="{C_DEF}"
+
+# param 1 - actual number of parameters
+# param 2 - required number of parameters
+# param 3 - incorrect parameters message
+check_params() {{
+  [[ "$1" < "$2" ]] && {{ echo -e "$3"; exit; }}
+}}
+
+print_command() {{
+  [[ $debug_yn == y ]] && {{ echo "COMMAND: $*" | sed 's/"/\\"/g'; echo "COMMAND: $*" | sed 's/./-/g'; }}
+}}
+'''
+
+    aliases, comp_opts = [], []
+    current_group = ""
+    
+    for item in cmds:
+        if item[0] == 'raw':
+            script += item[1] + '\n'
+            continue
+            
+        cmd, group = item[1], item[2]
+        
+        # Add group header if changed
+        if group != current_group:
+            script += f'section="{group}"\n'
+            current_group = group
+        
+        # Generate command check
+        keys_template = ' '.join(f'${i+1}' for i in range(len(cmd.keys)))
+        usage = f"{C_MAG}{cmd.all_keys} {C_CYA}({cmd.shortcut}){C_WHI}"
+        for p, opt in cmd.params:
+            if opt:
+                usage += f" [{p}]"
+            else:
+                usage += f" <{p}>"
+        if cmd.help:
+            usage += f"{C_GRE} # {cmd.help}"
+        usage += f"{C_DEF}"
+        
+        script += f'''
+if [[ "{keys_template}" == "{cmd.all_keys}" || "$1" == "{cmd.shortcut}" ]]; then
+   [[ "$1" == "{cmd.shortcut}" ]] && shift || shift {len(cmd.keys)}
+   usage="{usage}"
+   check_params $# {cmd.num_mandatory} "Usage: $usage"
+'''
+        if cmd.all_keys not in ['h', 'help']:
+            escaped_cmd = cmd.cmd.replace('"', '\\"')
+            script += f'''   print_command " {escaped_cmd}"\n'''
+        script += f'   {cmd.cmd}\n   exit\nfi\n'
+        
+        # Add alias
+        aliases.append(f"alias @{cmd.shortcut}='{cli_name} {cmd.shortcut}'")
+        
+        # Add completion
+        if cmd.comp:
+            comp_opts.append(f'''
+        if [[ "$all" == "{cmd.all_keys}" || "$prev" == "{cmd.shortcut}" || "$prev" == "@{cmd.shortcut}" ]]; then
+            COMPREPLY=( $(compgen -W "$({cmd.comp})" -- "$cur") )
+        fi''')
+    
+    # Add help command
+    script += f'''
+if [[ "$1" == "" ]]; then
+  echo "No option passed"
+else
+  echo "$*: invalid option"
+fi
+echo "Try \"{cli_name} help\" for more information."
+'''
+    
+    return script, aliases, comp_opts
+
+def gen_alias_file(cli_name, aliases, comp_opts):
+    """Generate alias and completion file"""
+    alias_names = ' '.join(a.split('=')[0][6:] for a in aliases)
+
+    return f'''# Completion function
+_{cli_name}_complete() {{
+    local cur prev all
+    all=""
+    for ((i = 1; i < ${{#COMP_WORDS[@]}}; i++)); do
+        word="${{COMP_WORDS[i]}}"
+        [[ $word != -* ]] && all+="$word "
+    done
+    all="$(echo $all | xargs)"
+    cur="${{COMP_WORDS[COMP_CWORD]}}"
+    prev_step=1
+    prev="${{COMP_WORDS[COMP_CWORD-$prev_step]}}"
+    while [[ "${{prev:0:1}}" == "-" ]]; do
+        let prev_step=prev_step+1
+        prev="${{COMP_WORDS[COMP_CWORD-$prev_step]}}"
+    done
+{''.join(comp_opts)}
+}}
+complete -F _{cli_name}_complete {cli_name} {alias_names}
+
+# Shortcut aliases
+{chr(10).join(aliases)}
+'''
+
+def gen_markdown_file(cli_name, cmds, title, description):
+    """Generate markdown documentation file"""
+    md_content = f"# {title if title else cli_name.upper()}\n\n"
+    if description:
+        md_content += '\n'.join(description) + '\n\n'
+    md_content += f"*Generated: {datetime.now().strftime('%Y-%m-%d %H:%M')}*\n\n"
+
+    current_group = ""
+
+    for item in cmds:
+        if item[0] == 'raw':
+            continue
+
+        cmd, group = item[1], item[2]
+
+        # Add group header if changed
+        if group != current_group and group:
+            md_content += f"\n## {group}\n\n"
+            current_group = group
+        elif group != current_group and not group:
+            current_group = group
+
+        # Format command usage
+        usage = f"{cmd.all_keys} ({cmd.shortcut})"
+        for p, opt in cmd.params:
+            if opt:
+                usage += f" [{p}]"
+            else:
+                usage += f" <{p}>"
+
+        # Add command entry
+        md_content += f"**`{usage}`**"
+        if cmd.help:
+            md_content += f" - {cmd.help}"
+        md_content += "\n\n"
+
+    return md_content
+
+def main():
+    debug = '-d' in sys.argv
+    if debug:
+        sys.argv.remove('-d')
+    
+    if len(sys.argv) < 2 or sys.argv[1] in ['-h', '--help']:
+        print(HELP_TEXT)
+        return
+    
+    print(f"CLI Builder - Generating CLI scripts\n")
+    print(f"Processing: {', '.join(sys.argv[1:])}\n")
+    for arg in sys.argv[1:]:
+        def_file = arg.replace('.def', '')
+        
+        if not os.path.exists(f'{def_file}.def'):
+            print(f'Error: Definition file "{def_file}.def" missing')
+            return
+        
+        cli_name = def_file
+        
+        # Parse definition file
+        with open(f'{def_file}.def') as f:
+            lines = [l.rstrip() for l in f]
+
+        # Handle line continuations, extract title, description, and aliasLeadChars
+        i = 0
+        title = ""
+        description = []
+        alias_lead_chars = cli_name[0]  # Default to first char of filename
+        while i < len(lines):
+            if lines[i].startswith('@ ') and not lines[i].startswith('@@ '):
+                title = lines[i][2:].strip()
+                del lines[i]
+                continue
+            if lines[i].startswith('@@ '):
+                description.append(lines[i][3:].strip())
+                del lines[i]
+                continue
+            if lines[i].startswith('aliasLeadChars:'):
+                alias_lead_chars = lines[i].split(':', 1)[1].strip()
+                del lines[i]
+                continue
+            if lines[i].endswith('\\'):
+                lines[i] = lines[i][:-1] + lines[i+1].lstrip()
+                del lines[i+1]
+            else:
+                i += 1
+
+        cmds = parse_def(lines, title, description, cli_name, alias_lead_chars)
+        
+        if debug:
+            print("Commands")
+            print("--------")
+            for item in cmds:
+                if item[0] == 'cmd':
+                    print(f"- {item[1].all_keys} ({item[1].shortcut})")
+        
+        # Generate files
+        script, aliases, comp_opts = gen_script(cli_name, cmds, debug)
+        alias_content = gen_alias_file(cli_name, aliases, comp_opts)
+        markdown_content = gen_markdown_file(cli_name, cmds, title, description)
+
+        with open(cli_name, 'w') as f:
+            f.write(script)
+        os.chmod(cli_name, 0o755)
+
+        with open(f'{cli_name}.alias', 'w') as f:
+            f.write(alias_content)
+
+        with open(f'{cli_name}.md', 'w') as f:
+            f.write(markdown_content)
+
+        print(f"Generated {cli_name}, {cli_name}.alias, and {cli_name}.md")
+
+if __name__ == '__main__':
+    main()
+```
