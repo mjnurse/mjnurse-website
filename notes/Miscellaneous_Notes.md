@@ -180,6 +180,13 @@ The notes captured in the Linux notes tool = `n`.
 |`sort -h`|Sort human readable numbers eg 1.2GB, 9KB|
 
 
+### sqlite
+
+|||
+|---|---|
+|`REPLACE(PRINTF('%100c', ' '), ' ', 'X')`|Generate a string of 100 X's|
+
+
 ### tar
 
 |||

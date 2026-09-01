@@ -4,6 +4,10 @@ title: imp - Improve text using Claude AI
 
 ```bash
 #!/usr/bin/env bash
+
+# Unset expired Google Application Default Credentials to prevent RAPT errors
+unset GOOGLE_APPLICATION_CREDENTIALS
+
 help_text="
 NAME
     imp - Improve text using Claude AI.
