@@ -126,6 +126,20 @@ The notes captured in the Linux notes tool = `n`.
 |`if [[ -z "$var" ]]`|Zero length / empty check|
 
 
+### jq
+
+|||
+|---|---|
+|`jq '. \| length'`|Count|
+|`jq '.[0]'`|Array item|
+|`jq '.[] \| select(x == "y")'`|Filter|
+|`jq '.[] \| {a, b}'`|Pick fields|
+|`jq '.[]'`|Loop array|
+|`jq '.a.b.c'`|Nested field|
+|`jq '.field'`|Get a field|
+|`jq -r '.field'`|Raw output |
+
+
 ### ln
 
 |||
