@@ -5,7 +5,7 @@ The notes captured in the Linux notes tool = `n`.
 ### 7zip
 
 <table>
-<tr><td><code>7z a -p -mhe=on archive.7z <files_or_folders></code></td><td>-mhe=on - encrypt file contents and filenames/headers.</td></tr>
+<tr><td><code>7z a -p -mhe=on archive.7z &lt;files_or_folders&gt;</code></td><td>-mhe=on - encrypt file contents and filenames/headers.</td></tr>
 </table>
 
 ### ES
@@ -43,11 +43,11 @@ The notes captured in the Linux notes tool = `n`.
 ### bash
 
 <table>
-<tr><td><code>!! !<abc> !!:p !<abc>:p</code></td><td>Run last command (:p - print command)</td></tr>
+<tr><td><code>!! !&lt;abc&gt; !!:p !&lt;abc&gt;:p</code></td><td>Run last command (:p - print command)</td></tr>
 <tr><td><code>!^ !$ !:2 !:2-4</code></td><td>First, Last, 2nd, 2nd to 4th arguments from prev command (!:0 is last command)</td></tr>
 <tr><td><code>#!/usr/bin/env bash</code></td><td>First line bash script</td></tr>
 <tr><td><code>cp file.txt{,.bak}</code></td><td>cp file.txt file.txt.bak</td></tr>
-<tr><td><code>echo {0..10..2}</code></td><td>0 -> 10 in steps of 2: 0 2 4 6 8 10</td></tr>
+<tr><td><code>echo {0..10..2}</code></td><td>0 -&gt; 10 in steps of 2: 0 2 4 6 8 10</td></tr>
 <tr><td><code>echo {1,2}{a..e}</code></td><td>1a 1b 1c 1d 1e 2a 2b 2c 2d 2e</td></tr>
 <tr><td><code>o="$(!!)"</code></td><td>Rerun last command and capture output eg. `which f.txt`, `o="$(!!)"`, `vi "$o"`</td></tr>
 </table>
@@ -94,7 +94,7 @@ The notes captured in the Linux notes tool = `n`.
 ### git
 
 <table>
-<tr><td><code>git checkout tags/<tag name></code></td><td>checkout a git tag.</td></tr>
+<tr><td><code>git checkout tags/&lt;tag name&gt;</code></td><td>checkout a git tag.</td></tr>
 <tr><td><code>git push --set-upstream origin main</code></td><td>set main as default origin branch</td></tr>
 </table>
 
@@ -127,14 +127,14 @@ The notes captured in the Linux notes tool = `n`.
 ### ln
 
 <table>
-<tr><td><code>ln -s <target_file_or_dir> [<link_name>]</code></td><td>-s symbolic link (ie a pointer), hard link is same item two names</td></tr>
+<tr><td><code>ln -s &lt;target_file_or_dir&gt; [&lt;link_name&gt;]</code></td><td>-s symbolic link (ie a pointer), hard link is same item two names</td></tr>
 </table>
 
 ### postgres
 
 <table>
-<tr><td><code>ALTER ROLE <username> SET search_path TO <schema name>;</code></td><td>Permanently alter search_path.</td></tr>
-<tr><td><code>SET search_path TO <schema name>;</code></td><td>Alter the schema searched.</td></tr>
+<tr><td><code>ALTER ROLE &lt;username&gt; SET search_path TO &lt;schema name&gt;;</code></td><td>Permanently alter search_path.</td></tr>
+<tr><td><code>SET search_path TO &lt;schema name&gt;;</code></td><td>Alter the schema searched.</td></tr>
 <tr><td><code>SHOW search_path;</code></td><td>show the currently search schema.</td></tr>
 <tr><td><code>export PGPASSWORD=postgres</code></td><td>Set password</td></tr>
 <tr><td><code>export PGPASSWORD=postgres; cat my.sql \| psql -h localhost -U postgres -d postgres</code></td><td>Run my.sql</td></tr>
@@ -149,10 +149,10 @@ The notes captured in the Linux notes tool = `n`.
 ### psql
 
 <table>
-<tr><td><code>SET search_path=<schema>[,<schema>];</code></td><td>set current schema(s)</td></tr>
+<tr><td><code>SET search_path=&lt;schema&gt;[,&lt;schema&gt;];</code></td><td>set current schema(s)</td></tr>
 <tr><td><code>SHOW search_path;</code></td><td>show current schema(s)</td></tr>
-<tr><td><code>\c <db></code></td><td>connect to database</td></tr>
-<tr><td><code>\d <table></code></td><td>describe table</td></tr>
+<tr><td><code>\c &lt;db&gt;</code></td><td>connect to database</td></tr>
+<tr><td><code>\d &lt;table&gt;</code></td><td>describe table</td></tr>
 <tr><td><code>\dn</code></td><td>list schemas</td></tr>
 <tr><td><code>\dt</code></td><td>list tables</td></tr>
 <tr><td><code>\l</code></td><td>list databases</td></tr>
@@ -182,7 +182,7 @@ The notes captured in the Linux notes tool = `n`.
 
 <table>
 <tr><td><code>tar -cvzf filename sourcedir</code></td><td>Create tarball.</td></tr>
-<tr><td><code>tar -xvzf <filename></code></td><td>Extract zipped tarball.</td></tr>
+<tr><td><code>tar -xvzf &lt;filename&gt;</code></td><td>Extract zipped tarball.</td></tr>
 </table>
 
 ### tr
