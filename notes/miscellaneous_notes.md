@@ -17,13 +17,13 @@ The notes captured in the Linux notes tool = `n`.
 ### Excel
 
 <table>
-Open Drop-down in Cell - ALT-DOWN_ARROW
+<tr><td>Open Drop-down in Cell - ALT-DOWN_ARROW</td></tr>
 </table>
 
 ### Windows
 
 <table>
-WIN-H - turn on dictation
+<tr><td>WIN-H - turn on dictation</td></tr>
 </table>
 
 ### apt
@@ -55,18 +55,18 @@ WIN-H - turn on dictation
 ### claude
 
 <table>
-Quick/simple → Haiku; Everything else → Sonnet; Hard problems → Opus
+<tr><td>Quick/simple → Haiku; Everything else → Sonnet; Hard problems → Opus</td></tr>
 </table>
 
 ### code
 
 <table>
-ALT+z - Enable word wrap
-CTRL+, - Open Settings
-CTRL+. - Fix problem
-CTRL+; - Find next problem (I added this shortcut)
-CTRL+k CTRL+s - Open Keyboard Shortcuts
-CTRL-k v - View markdown and markdown preview side by side
+<tr><td>ALT+z - Enable word wrap</td></tr>
+<tr><td>CTRL+, - Open Settings</td></tr>
+<tr><td>CTRL+. - Fix problem</td></tr>
+<tr><td>CTRL+; - Find next problem (I added this shortcut)</td></tr>
+<tr><td>CTRL+k CTRL+s - Open Keyboard Shortcuts</td></tr>
+<tr><td>CTRL-k v - View markdown and markdown preview side by side</td></tr>
 </table>
 
 ### column
@@ -88,7 +88,7 @@ CTRL-k v - View markdown and markdown preview side by side
 ### gcp
 
 <table>
-gcloud auth login --no-launch-browser
+<tr><td>gcloud auth login --no-launch-browser</td></tr>
 </table>
 
 ### git
