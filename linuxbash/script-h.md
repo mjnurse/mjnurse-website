@@ -142,23 +142,57 @@ prev_char=""
 find . -maxdepth 1 -type f -executable -printf "%f\n" \
     | xargs grep -H -s -i -e "^help_line=" -e "^-- help_line:" | egrep "$filter" > /tmp/h.tmp
 
+# Append any alias descriptions to the help lines
+aliases="$(grep -E "^alias " /home/martin/mjnurse/bash/mjn-bashrc)"
+while IFS= read -r line; do
+    # Extract the script name (text before the first colon)
+    script_name=$(echo "$line" | cut -d: -f1)
+    # echo SCRIPT: $script_name
+
+    # Check if an alias exists for this script name
+    alias_desc=$(alias | grep "$script_name" 2>/dev/null | sed "s/^alias $script_name='\(.*\)'$/\1/")
+    alias_desc="$(egrep "alias.*'$script_name'" <<< "$aliases" | sed 's/^alias  *\([^=]*\)=.*/\1/')"
+    # echo ALIAS: $alias_desc
+
+    # If an alias exists and is different from the script name itself
+    if [ -n "$alias_desc" ] && [ "$alias_desc" != "$script_name" ]; then
+        # Append the alias description to the line
+        echo "$line(#CGREalias: #CLGRE${alias_desc}#CDEF)"
+    else
+        # No alias found, print the line as-is
+        echo "$line"
+    fi
+done < /tmp/h.tmp > /tmp/h.tmp2
+
+cp /tmp/h.tmp2 /tmp/h.tmp
+
 if [[ -f /home/martin/mjnurse/bash/mjn-bashrc ]]; then
     grep func: /home/martin/mjnurse/bash/mjn-bashrc | \
         egrep "$filter" | \
-        sed 's/ *# *func: *\([^ :]\+\): *\(.*\)$/\1:help_line="\2 BASHFUNC"/' >> /tmp/h.tmp
+        sed 's/ *# *func: *\([^ :]\+\): *\(.*\)$/\1:help_line="\2 #CGRA(bash-function)#CDEF"/' >> /tmp/h.tmp
+
+    grep -E "^alias.*#" /home/martin/mjnurse/bash/mjn-bashrc | \
+        egrep "$filter" | \
+        sed 's/alias *\([^=]*\)=\(.*\)# help_line:*=* *\(.*\) *$/\1:help_line="\3 #CGRA(alias-only: \2)#CDEF"/' >> /tmp/h.tmp
 fi
 
 cat /tmp/h.tmp | \
-sed ' 
+sed '
+    s/\\/\\\\/g;
     /help_line=.*tbc.*/d
     /^h:/d; s/help_line=//I; s/-- help_line://I; s/"/ /g;
     /tidy:.*echo/d;
     /^README.*md/d;
     s/:[0-9][0-9]*:/:/;
+    s/ )#CDEF/)#CDEF/;
+    s/#CGRE/'${cgre}'/g;
+    s/#CLGRE/'${clgre}'/g;
+    s/#CGRA/'${cgra}'/g;
+    s/#CDEF/'${cdef}'/g;
     ' | \
 sort | while IFS= read -r line ; do 
     curr_char="${line:0:1}"
-    line="${line/BASHFUNC/$cgra(bash-function)$cdef}"
+    line="${line/ALIASONLY/${cgra}alias-only:}"
     if [[ "$curr_char" != "$prev_char" ]]; then
          prev_char="$curr_char"
          echo -e "${clmag}${curr_char}${cdef} - ${clcya}$line"
