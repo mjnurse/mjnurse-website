@@ -96,7 +96,7 @@ if [[ $noissues_yn == n ]]; then
         cecho lmag No help_line:
         cecho lmag -------------
         cat /tmp/h.tmp \
-           | grep -E "${filter}" \
+           | grep -E --ignore-case "${filter}" \
            | sed "/\.dat$/d; /^vimspell/d;
                  s/${filter//\.\*/}/${cyel}${filter//\.\*/}${cdef}/g;
                  " 
@@ -105,8 +105,8 @@ fi
 
 if [[ $noissues_yn == n ]]; then
     find . -maxdepth 1 -type f -executable -printf "%f\n" \
-        | xargs egrep -s -l -e "help_line=.*tbc.*" \
-        | grep -E "${filter}" \
+        | xargs egrep -s -l -e --ignore-case "help_line=.*tbc.*" \
+        | grep -E --ignore-case "${filter}" \
         | sed "/README.*.md/d; /^h$/d; /tmp0/d
                s/${filter//\.\*/}/${cyel}${filter//\.\*/}${cdef}/g;
               " \
@@ -140,18 +140,18 @@ fi
 prev_char=""
 
 find . -maxdepth 1 -type f -executable -printf "%f\n" \
-    | xargs grep -H -s -i -e "^help_line=" -e "^-- help_line:" | egrep "$filter" > /tmp/h.tmp
+    | xargs grep --ignore-case -H -s -i -e "^help_line=" -e "^-- help_line:" | egrep --ignore-case "$filter" > /tmp/h.tmp
 
 # Append any alias descriptions to the help lines
-aliases="$(grep -E "^alias " /home/martin/mjnurse/bash/mjn-bashrc)"
+aliases="$(grep -E --ignore-case "^alias " /home/martin/mjnurse/bash/mjn-bashrc)"
 while IFS= read -r line; do
     # Extract the script name (text before the first colon)
     script_name=$(echo "$line" | cut -d: -f1)
     # echo SCRIPT: $script_name
 
     # Check if an alias exists for this script name
-    alias_desc=$(alias | grep "$script_name" 2>/dev/null | sed "s/^alias $script_name='\(.*\)'$/\1/")
-    alias_desc="$(egrep "alias.*'$script_name'" <<< "$aliases" | sed 's/^alias  *\([^=]*\)=.*/\1/')"
+    alias_desc=$(alias | grep --ignore-case "$script_name" 2>/dev/null | sed "s/^alias $script_name='\(.*\)'$/\1/")
+    alias_desc="$(egrep --ignore-case "alias.*'$script_name'" <<< "$aliases" | sed 's/^alias  *\([^=]*\)=.*/\1/')"
     # echo ALIAS: $alias_desc
 
     # If an alias exists and is different from the script name itself
@@ -167,12 +167,12 @@ done < /tmp/h.tmp > /tmp/h.tmp2
 cp /tmp/h.tmp2 /tmp/h.tmp
 
 if [[ -f /home/martin/mjnurse/bash/mjn-bashrc ]]; then
-    grep func: /home/martin/mjnurse/bash/mjn-bashrc | \
-        egrep "$filter" | \
+    grep --ignore-case func: /home/martin/mjnurse/bash/mjn-bashrc | \
+        egrep --ignore-case "$filter" | \
         sed 's/ *# *func: *\([^ :]\+\): *\(.*\)$/\1:help_line="\2 #CGRA(bash-function)#CDEF"/' >> /tmp/h.tmp
 
-    grep -E "^alias.*#" /home/martin/mjnurse/bash/mjn-bashrc | \
-        egrep "$filter" | \
+    grep -E --ignore-case "^alias.*#" /home/martin/mjnurse/bash/mjn-bashrc | \
+        egrep --ignore-case "$filter" | \
         sed 's/alias *\([^=]*\)=\(.*\)# help_line:*=* *\(.*\) *$/\1:help_line="\3 #CGRA(alias-only: \2)#CDEF"/' >> /tmp/h.tmp
 fi
 
