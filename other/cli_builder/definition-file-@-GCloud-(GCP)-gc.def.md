@@ -23,6 +23,13 @@ auth login (al) [-a] :: \
     fi \
     ## auth login with --no-launch-browser. -a: adds application-default
 
+auth reset (ar) :: \
+    gcloud auth revoke $EMAIL; \
+    gcloud auth application-default revoke; \
+    gcloud auth application-default login; \
+    gcloud auth login \
+    ## Full reset of gcloud auth when having issues
+
 config list (cl) :: gcloud config list
 
 # --------------------------------------------------------------------------------
@@ -53,7 +60,8 @@ compute instances list (cil) :: gc compute instances list
 = Kubernetes/Containers
 # --------------------------------------------------------------------------------
 
-kube clusters list (kcl) :: gcloud container clusters list```
+kube clusters list (kcl) :: gcloud container clusters list
+```
 
 ## Alias file
 
@@ -76,11 +84,12 @@ _gc_complete() {
     done
 
 }
-complete -F _gc_complete gc @ghe @gal @gcl @gpg @gpl @gps @gcil @gkcl
+complete -F _gc_complete gc @ghe @gal @gar @gcl @gpg @gpl @gps @gcil @gkcl
 
 # Shortcut aliases
 alias @ghe='gc ghe'
 alias @gal='gc gal'
+alias @gar='gc gar'
 alias @gcl='gc gcl'
 alias @gpg='gc gpg'
 alias @gpl='gc gpl'
@@ -120,7 +129,7 @@ echo -e "\x1b[92m------------\x1b[0m"
 echo -e "\x1b[92mGCloud (GCP)\x1b[0m"
 echo -e "\x1b[92m------------\x1b[0m"
 
-echo -e "\x1b[95mgenerated:2026-09-07 10:37\x1b[0m"
+echo -e "\x1b[95mgenerated:2026-09-08 09:30\x1b[0m"
 echo
 filter="$1"
 if [[ -n "$filter" ]]; then
@@ -153,6 +162,15 @@ if [[ "$1 $2" == "auth login" || "$1" == "gal" ]]; then
    check_params $# 0 "Usage: $usage"
    print_command " if [[ \"$1\" == \"-a\" ]]; then gcloud auth application-default login --no-launch-browser; else gcloud auth login --no-launch-browser; fi"
    if [[ "$1" == "-a" ]]; then gcloud auth application-default login --no-launch-browser; else gcloud auth login --no-launch-browser; fi
+   exit
+fi
+
+if [[ "$1 $2" == "auth reset" || "$1" == "gar" ]]; then
+   [[ "$1" == "gar" ]] && shift || shift 2
+   usage="\x1b[95mauth reset \x1b[96m(gar)\x1b[97m\x1b[92m # Full reset of gcloud auth when having issues\x1b[0m"
+   check_params $# 0 "Usage: $usage"
+   print_command " gcloud auth revoke $EMAIL; gcloud auth application-default revoke; gcloud auth application-default login; gcloud auth login"
+   gcloud auth revoke $EMAIL; gcloud auth application-default revoke; gcloud auth application-default login; gcloud auth login
    exit
 fi
 
