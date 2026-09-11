@@ -46,6 +46,7 @@ The notes captured in the Linux notes tool = `n`.
 <tr><td><code>!! !&lt;abc&gt; !!:p !&lt;abc&gt;:p</code></td><td>Run last command (:p - print command)</td></tr>
 <tr><td><code>!^ !$ !:2 !:2-4</code></td><td>First, Last, 2nd, 2nd to 4th arguments from prev command (!:0 is last command)</td></tr>
 <tr><td><code>#!/usr/bin/env bash</code></td><td>First line bash script</td></tr>
+<tr><td><code>${var^^} ${var,,}</code></td><td>var to UPPERCASE, lowercase</td></tr>
 <tr><td><code>cp file.txt{,.bak}</code></td><td>cp file.txt file.txt.bak</td></tr>
 <tr><td><code>echo {0..10..2}</code></td><td>0 -&gt; 10 in steps of 2: 0 2 4 6 8 10</td></tr>
 <tr><td><code>echo {1,2}{a..e}</code></td><td>1a 1b 1c 1d 1e 2a 2b 2c 2d 2e</td></tr>
@@ -107,6 +108,9 @@ The notes captured in the Linux notes tool = `n`.
 ### if
 
 <table>
+<tr><td><code>if [[ -d "&lt;directory&gt;" ]]</code></td><td>Check directory exists</td></tr>
+<tr><td><code>if [[ -e "&lt;path&gt;" ]]</code></td><td>Check any path (file, directory, device, etc.) exists</td></tr>
+<tr><td><code>if [[ -f "&lt;file&gt;" ]]</code></td><td>Check file exists</td></tr>
 <tr><td><code>if [[ -n "$var" ]]</code></td><td>Non-zero length / not empty check</td></tr>
 <tr><td><code>if [[ -z "$var" ]]</code></td><td>Zero length / empty check</td></tr>
 </table>
