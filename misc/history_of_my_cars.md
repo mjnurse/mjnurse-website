@@ -70,7 +70,7 @@ An electric car.  Came with the Pilot and Plus packs.  Harman Kardon sound syste
 
 ### 1. Austin Metro
 
-<p align="left"><img src="images/Metro-300x214.jpg"></p>
+<img style="margin: 1.5em 0em;" src="images/Metro-300x214.jpg">
 
 **41bhp. 53-ft. 0-60mph: 18.2s. Max: 86mph.**
 
