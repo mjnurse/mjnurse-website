@@ -47,6 +47,7 @@ The notes captured in the Linux notes tool = `n`.
 <tr><td><code>!^ !$ !:2 !:2-4</code></td><td>First, Last, 2nd, 2nd to 4th arguments from prev command (!:0 is last command)</td></tr>
 <tr><td><code>#!/usr/bin/env bash</code></td><td>First line bash script</td></tr>
 <tr><td><code>${var^^} ${var,,}</code></td><td>var to UPPERCASE, lowercase</td></tr>
+<tr><td><code>COLUMNS=1; PS3="Choose: "; select v in *; do [[ -n $v ]] && break; done</code></td><td>Generate a numbered list of options</td></tr>
 <tr><td><code>cp file.txt{,.bak}</code></td><td>cp file.txt file.txt.bak</td></tr>
 <tr><td><code>echo {0..10..2}</code></td><td>0 -&gt; 10 in steps of 2: 0 2 4 6 8 10</td></tr>
 <tr><td><code>echo {1,2}{a..e}</code></td><td>1a 1b 1c 1d 1e 2a 2b 2c 2d 2e</td></tr>
