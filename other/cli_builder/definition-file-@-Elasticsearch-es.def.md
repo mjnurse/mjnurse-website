@@ -6,18 +6,18 @@ title: @ Elasticsearch CLI
 The definition file contains command definitions for the CLI builder.
 
 ```bash
-@ Elasticsearch 
+@ Elasticsearch
 
 cmd ES_HOST="${ES_HOST:-localhost}"
 cmd ES_PORT="${ES_PORT:-9200}"
 cmd if [[ "${ES_PATH%/}" != "" ]]; then ES_PATH="/${ES_PATH%/}"; fi
 cmd ES_PROTOCOL="${ES_PROTOCOL:-http}"
 
-@@ CLI uses environment variables: 
-@@ - ES_PROTOCOL (default: http), 
+@@ CLI uses environment variables:
+@@ - ES_PROTOCOL (default: http),
 @@ - ES_HOST (default: localhost)
-@@ - ES_PORT (default: 9200), 
-@@ - ES_PATH (default: <blank>), and 
+@@ - ES_PORT (default: 9200),
+@@ - ES_PATH (default: <blank>), and
 @@ - ES_AUTH (default: <blank> - no auth required)
 @@ Use command show settings (ss) to see environment variable values.
 
@@ -25,30 +25,30 @@ cmd pj() { if command -v jq >/dev/null 2>&1; then jq .; else cat; fi; }
 
 cmd cols() { python3 -c 'import sys,json;f=lambda d,p="":[f(v["properties"],p+k+".") if isinstance(v,dict) and "properties" in v else print(p+k) for k,v in d.items()];[f(i["mappings"]["properties"]) for i in json.load(sys.stdin).values()]'; }
 
-cmd q() { \
-    local method="$1"; \
-    shift; \
-    if [[ "$ES_AUTH" != "" ]]; then \
-        ES_AUTH="-u $ES_AUTH"; \
-    fi; \
-    curl -s -X $method $ES_AUTH $ES_PROTOCOL://$ES_HOST:$ES_PORT$ES_PATH/"$@"; \
-}
+cmd q() {
+    local method="$1"
+    shift
+    if [[ "$ES_AUTH" != "" ]]; then
+        ES_AUTH="-u $ES_AUTH"
+    fi
+    curl -s -X $method $ES_AUTH $ES_PROTOCOL://$ES_HOST:$ES_PORT$ES_PATH/"$@"
+    }
 
 # ----------------------------------------------------------------------------------------------------------------------------------
 = HELP
 # ----------------------------------------------------------------------------------------------------------------------------------
 
-show settings (ss) :: \
-    echo Environment Variables:; \
-    echo ----------------------; \
-    echo "ES_PROTOCOL: $ES_PROTOCOL"; \
-    echo "ES_HOST:     $ES_HOST"; \
-    echo "ES_PORT:     $ES_PORT"; \
-    echo "ES_PATH:     $ES_PATH"; \
-    if [[ "$ES_AUTH" == "" ]]; then \
-        echo "ES_AUTH:     not set"; \
-    else \
-        echo "ES_AUTH:     is set"; \
+show settings (ss) ::
+    echo Environment Variables:
+    echo ----------------------
+    echo "ES_PROTOCOL: $ES_PROTOCOL"
+    echo "ES_HOST:     $ES_HOST"
+    echo "ES_PORT:     $ES_PORT"
+    echo "ES_PATH:     $ES_PATH"
+    if [[ "$ES_AUTH" == "" ]]; then
+        echo "ES_AUTH:     not set"
+    else
+        echo "ES_AUTH:     is set"
     fi
 
 
@@ -56,194 +56,194 @@ show settings (ss) :: \
 = CLUSTER
 # ----------------------------------------------------------------------------------------------------------------------------------
 
-clear cache (cc) [<index_name>] :: \
-    q POST "$1/_cache/clear" \
+clear cache (cc) [<index_name>] ::
+    q POST "$1/_cache/clear"
     !! cat /tmp/es_idx_list 2>&1
 
-cluster overview (co) :: \
+cluster overview (co) ::
     q GET ""
 
-cluster health (ch) :: \
+cluster health (ch) ::
     q GET "_cluster/health?human&pretty"
 
-cluster stats (cs) :: \
+cluster stats (cs) ::
     q GET "_cluster/stats?human&pretty"
 
-cluster recovery stats (crs) :: \
+cluster recovery stats (crs) ::
     q GET "_cat/recovery?v"
 
 # ----------------------------------------------------------------------------------------------------------------------------------
 = INDEX INTERROGATION
 # ----------------------------------------------------------------------------------------------------------------------------------
 
-count (c) <index_name> :: \
-    q GET "$1/_count?pretty" \
+count (c) <index_name> ::
+    q GET "$1/_count?pretty"
     !! cat /tmp/es_idx_list 2>&1
 
-list aliases (la) [<filter>] [<order_by_field_name>] :: \
+list aliases (la) [<filter>] [<order_by_field_name>] ::
     q GET "_cat/aliases/$1?v&s=$2"
 
-list indices (li) [-s] [<index_name>] :: \
-    if [[ "$1" == "-f" ]]; then watch es eli; exit; fi; \
-    ord="index"; \
-    if [[ "$1" == "-s" ]]; then \
-        ord="store.size"; \
-        shift; \
-    fi; \
-    q GET "_cat/indices/$1?v&h=health,status,index,pri,rep,sc,docs.count,docs.deleted,store.size,pri.store.size&s=$ord" | tee /tmp/es_idx_list; \
-    sed -i 's/^[^ ][^ ]*  *[^ ][^ ]*  *//; s/ .*//' /tmp/es_idx_list \
-    !! cat /tmp/es_idx_list 2>&1 \
+list indices (li) [-s] [<index_name>] ::
+    if [[ "$1" == "-f" ]]; then watch es eli; exit; fi
+    ord="index"
+    if [[ "$1" == "-s" ]]; then
+        ord="store.size"
+        shift
+    fi
+    q GET "_cat/indices/$1?v&h=health,status,index,pri,rep,sc,docs.count,docs.deleted,store.size,pri.store.size&s=$ord" | tee /tmp/es_idx_list
+    sed -i 's/^[^ ][^ ]*  *[^ ][^ ]*  *//; s/ .*//' /tmp/es_idx_list
+    !! cat /tmp/es_idx_list 2>&1
     ## -s: order by size
 
-list open (lo) [<index_name>] :: \
-    q GET "_cat/indices/$1?v&h=health,status,index,pri,rep,sc,docs.count,docs.deleted,store.size,pri.store.size&s=index" | sed "/ close  /d" \
+list open (lo) [<index_name>] ::
+    q GET "_cat/indices/$1?v&h=health,status,index,pri,rep,sc,docs.count,docs.deleted,store.size,pri.store.size&s=index" | sed "/ close  /d"
     !! cat /tmp/es_idx_list 2>&1
 
-list dot indices (ldi) :: \
-    q GET "_cat/indices/.*?v&s=index" \
+list dot indices (ldi) ::
+    q GET "_cat/indices/.*?v&s=index"
     !! cat /tmp/es_idx_list 2>&1
 
-list shards (ls) [<index_name>] [<order_by_field_name>] :: \
-    q GET "_cat/shards/$1?v&h=index,shard,prirep,sc,state,docs,store,node&s=index,shard,prirep&s=$2" \
+list shards (ls) [<index_name>] [<order_by_field_name>] ::
+    q GET "_cat/shards/$1?v&h=index,shard,prirep,sc,state,docs,store,node&s=index,shard,prirep&s=$2"
     !! cat /tmp/es_idx_list 2>&1
 
-list shard details (lsd) [<index_name>] [<order_by_field_name>] :: \
-    q GET "_cat/shards/$1?v&h=index,shard,prirep,state,docs,store,ip,segments.count,unassigned.reason,unassigned.for,node&s=$2" \
+list shard details (lsd) [<index_name>] [<order_by_field_name>] ::
+    q GET "_cat/shards/$1?v&h=index,shard,prirep,state,docs,store,ip,segments.count,unassigned.reason,unassigned.for,node&s=$2"
     !! cat /tmp/es_idx_list 2>&1
 
-list segments (le) [<index_name>] :: \
-    q GET "_cat/segments/$1?v&s=index,shard,prirep" \
+list segments (le) [<index_name>] ::
+    q GET "_cat/segments/$1?v&s=index,shard,prirep"
     !! cat /tmp/es_idx_list 2>&1
 
-list segmented shards (lss) [<index_name>] :: \
-    q GET "_cat/shards/$1?v&h=index,shard,prirep,state,docs,node,segments.count&s=index,shard,prirep,node" \
+list segmented shards (lss) [<index_name>] ::
+    q GET "_cat/shards/$1?v&h=index,shard,prirep,state,docs,node,segments.count&s=index,shard,prirep,node"
     !! cat /tmp/es_idx_list 2>&1
 
-list avg segments per shard (lass) [<index_name>] :: \
-    q GET "_cat/segments/$1?v&s=index,shard,prirep" | tail -n +2 | sed 's/[[:space:]]\+/ /g' | cut -d ' ' -f1,2 | \
-    sort | uniq -c | \
-    awk '{c=$1; i=$2; sh=$3; se_c[i]+=c; sh_c[i]++} END {printf "%-52s Avg Segments\n","Index"; for (i in se_c) {avg=se_c[i]/sh_c[i]; printf "%-60s %.2f\n", i, avg}}' | sort \
+list avg segments per shard (lass) [<index_name>] ::
+    q GET "_cat/segments/$1?v&s=index,shard,prirep" | tail -n +2 | sed 's/[[:space:]]\+/ /g' | cut -d ' ' -f1,2 |
+    sort | uniq -c |
+    awk '{c=$1; i=$2; sh=$3; se_c[i]+=c; sh_c[i]++} END {printf "%-52s Avg Segments\n","Index"; for (i in se_c) {avg=se_c[i]/sh_c[i]; printf "%-60s %.2f\n", i, avg}}' | sort
     !! cat /tmp/es_idx_list 2>&1
 
-list fields (lf) <index_name> :: \
-    q GET "$1/_mapping" | cols \
+list fields (lf) <index_name> ::
+    q GET "$1/_mapping" | cols
     !! cat /tmp/es_idx_list 2>&1
 
-get index mapping (gim) <index_name> :: \
-    q GET "$1/_mapping?pretty" | \
-    sed -e ':a' -e 'N' -e '$!ba' \
-       -e 's/\n *\([^"]*"type"\)/ \1/g' \
-       -e 's/\n *\([^"]*"normalizer"\)/ \1/g' \
-       -e 's/\n *\([^"]*"index"\)/ \1/g' \
-       -e 's/\n *\([^"]*"ignore_above"\)/ \1/g' \
-       -e 's/\n *\([^"]*"fields"\)/ \1/g' \
-       -e 's/\n *\([^"]*"keyword"\)/ \1/g' \
-       -e 's/\n *\([^"]*"raw"\)/ \1/g' \
-       -e 's/\([a-z0-9"]\) *\n */\1 /g' \
-       -e 's/} *\n *}/} }/g' \
-       -e 's/} *\n *}/} }/g' \
+get index mapping (gim) <index_name> ::
+    q GET "$1/_mapping?pretty" |
+    sed -e ':a' -e 'N' -e '$!ba'
+       -e 's/\n *\([^"]*"type"\)/ \1/g'
+       -e 's/\n *\([^"]*"normalizer"\)/ \1/g'
+       -e 's/\n *\([^"]*"index"\)/ \1/g'
+       -e 's/\n *\([^"]*"ignore_above"\)/ \1/g'
+       -e 's/\n *\([^"]*"fields"\)/ \1/g'
+       -e 's/\n *\([^"]*"keyword"\)/ \1/g'
+       -e 's/\n *\([^"]*"raw"\)/ \1/g'
+       -e 's/\([a-z0-9"]\) *\n */\1 /g'
+       -e 's/} *\n *}/} }/g'
+       -e 's/} *\n *}/} }/g'
     !! cat /tmp/es_idx_list 2>&1
 
-list unassigned shards (lus) :: q GET "_cat/shards?v&h=index,shard,prirep,state,docs,segments.count&s=index,shard,prirep" 
+list unassigned shards (lus) :: q GET "_cat/shards?v&h=index,shard,prirep,state,docs,segments.count&s=index,shard,prirep"
 
-forcemerge progress (fmp) :: \
+forcemerge progress (fmp) ::
     q GET "_cat/nodes?v&h=name,cpu,load_1m,merges.current,merges.current_docs,merges.total,merges.total_docs&s=name"
 
 # ----------------------------------------------------------------------------------------------------------------------------------
 = INDEX MANIPULATION
 # ----------------------------------------------------------------------------------------------------------------------------------
 
-add index to alias (aita) <index_name> <alias_name> :: \
-    q POST "_aliases" -H 'Content-Type: application/json' -d '{"actions":[{"add":{"index":"'$1'","alias":"'$2'"}}]}' \
+add index to alias (aita) <index_name> <alias_name> ::
+    q POST "_aliases" -H 'Content-Type: application/json' -d '{"actions":[{"add":{"index":"'$1'","alias":"'$2'"}}]}'
     !! cat /tmp/es_idx_list 2>&1
 
-remove index from alias (rifa) <index_name> <alias_name> :: \
-    read -p "Are you sure [yN]? " yn; \
-    if [[ ${yn^} == Y ]]; then \
-         q DELETE "$1/_aliases/$2"; \
-    fi \
+remove index from alias (rifa) <index_name> <alias_name> ::
+    read -p "Are you sure [yN]? " yn
+    if [[ ${yn^} == Y ]]; then
+         q DELETE "$1/_aliases/$2"
+    fi
     !! cat /tmp/es_idx_list 2>&1
 
-create index (ci) <index_name> <number_of_shards> <number_of_replicas> :: \
-    q PUT "$1" -H 'Content-Type: application/json' -d '{"settings":{"index":{"number_of_shards":'$2',"number_of_replicas":'$3'}}}' \
+create index (ci) <index_name> <number_of_shards> <number_of_replicas> ::
+    q PUT "$1" -H 'Content-Type: application/json' -d '{"settings":{"index":{"number_of_shards":'$2',"number_of_replicas":'$3'}}}'
     !! cat /tmp/es_idx_list 2>&1
 
-create index from mapping (cifm) <index_name> <number_of_shards> <number_of_replicas> <mapping-json> :: \
-    q PUT "$1" -H 'Content-Type: application/json' -d '{"settings":{"index":{"number_of_shards":'$2',"number_of_replicas":'$3'}},"mappings":'"$4"'}' \
+create index from mapping (cifm) <index_name> <number_of_shards> <number_of_replicas> <mapping-json> ::
+    q PUT "$1" -H 'Content-Type: application/json' -d '{"settings":{"index":{"number_of_shards":'$2',"number_of_replicas":'$3'}},"mappings":'"$4"'}'
     !! cat /tmp/es_idx_list 2>&1
 
-clone index (clni) <index_name> <new_index_name> :: \
-    q POST "$1/_clone/$2" \
+clone index (clni) <index_name> <new_index_name> ::
+    q POST "$1/_clone/$2"
     !! cat /tmp/es_idx_list 2>&1
 
-delete index (di) <index_name> :: \
-    read -p "Are you sure [yN]? " yn; \
-    if [[ ${yn^} == Y ]]; then \
-         q DELETE "$1"; \
-    fi \
+delete index (di) <index_name> ::
+    read -p "Are you sure [yN]? " yn
+    if [[ ${yn^} == Y ]]; then
+         q DELETE "$1"
+    fi
     !! cat /tmp/es_idx_list 2>&1
 
-open index (opi) <index_name> :: \
-    q POST "$1/_open" \
+open index (opi) <index_name> ::
+    q POST "$1/_open"
     !! cat /tmp/es_idx_list 2>&1
 
-close index (cli) <index_name> :: \
-    q POST "$1/_close" \
+close index (cli) <index_name> ::
+    q POST "$1/_close"
     !! cat /tmp/es_idx_list 2>&1
 
-enable read only (ero) <index_name> :: \
-    q PUT "$1/_settings" -H 'Content-Type: application/json' -d '{"index.blocks.write": true}' \
+enable read only (ero) <index_name> ::
+    q PUT "$1/_settings" -H 'Content-Type: application/json' -d '{"index.blocks.write": true}'
     !! cat /tmp/es_idx_list 2>&1
 
-enable read write (erw) <index_name> :: \
-    q PUT "$1/_settings" -H 'Content-Type: application/json' -d '{"index.blocks.write": false}' \
+enable read write (erw) <index_name> ::
+    q PUT "$1/_settings" -H 'Content-Type: application/json' -d '{"index.blocks.write": false}'
     !! cat /tmp/es_idx_list 2>&1
 
-reindex index (ri) <source_index_name> <dest_index_name> :: \
-    q POST "_reindex" -H 'Content-Type: application/json' -d '{"source":{"index":"'$1'"},"dest":{"index":"'$2'"}}' \
+reindex index (ri) <source_index_name> <dest_index_name> ::
+    q POST "_reindex" -H 'Content-Type: application/json' -d '{"source":{"index":"'$1'"},"dest":{"index":"'$2'"}}'
     !! cat /tmp/es_idx_list 2>&1
 
-move shard (ms) <index_name> <shard_num> <from_node_name> <to_node_name> :: \
-    q POST "_cluster/reroute" -H 'Content-Type: application/json' -d '{"commands":[{"move":{"index":"'$1'","shard":'$2',"from_node":"'$3'","to_node":"'$4'"}}]}' \
+move shard (ms) <index_name> <shard_num> <from_node_name> <to_node_name> ::
+    q POST "_cluster/reroute" -H 'Content-Type: application/json' -d '{"commands":[{"move":{"index":"'$1'","shard":'$2',"from_node":"'$3'","to_node":"'$4'"}}]}'
     !! cat /tmp/es_idx_list 2>&1
 
-alter number replicas (anr) <index_name> <number_of_replicas> :: \
-    q PUT "$1/_settings" -H 'Content-Type: application/json' -d '{"index":{"number_of_replicas":'$2'}}' \
+alter number replicas (anr) <index_name> <number_of_replicas> ::
+    q PUT "$1/_settings" -H 'Content-Type: application/json' -d '{"index":{"number_of_replicas":'$2'}}'
     !! cat /tmp/es_idx_list 2>&1
 
-disable shard allocation (dsa) :: \
+disable shard allocation (dsa) ::
     q PUT "_cluster/settings" -H 'Content-Type: application/json' -d '{"persistent":{"cluster.routing.allocation.enable":"primaries"}}'
 
-reenable shard allocation (rsa) :: \
+reenable shard allocation (rsa) ::
     q PUT "_cluster/settings" -H 'Content-Type: application/json' -d '{"persistent":{"cluster.routing.allocation.enable":null}}'
 
-forcemerge (fm) <index_name> <max_num_segments> :: \
-    q POST "$1/_forcemerge?max_num_segments=$2" \
+forcemerge (fm) <index_name> <max_num_segments> ::
+    q POST "$1/_forcemerge?max_num_segments=$2"
     !! cat /tmp/es_idx_list 2>&1
 
-refresh (r) <index_name> :: \
-    q POST "$1/_refresh" \
+refresh (r) <index_name> ::
+    q POST "$1/_refresh"
     !! cat /tmp/es_idx_list 2>&1
 
 # ----------------------------------------------------------------------------------------------------------------------------------
 = INDEX ENTRY MANIPULATION
 # ----------------------------------------------------------------------------------------------------------------------------------
 
-add entry (ae) <index_name> <entry_json> :: q POST "$1/_doc" -H 'Content-Type: application/json' -d "$2" \
+add entry (ae) <index_name> <entry_json> :: q POST "$1/_doc" -H 'Content-Type: application/json' -d "$2"
     !! cat /tmp/es_idx_list 2>&1
 
-delete entry (de) <index_name> [<_id>] :: \
-    if [[ "$2" == "" ]]; then \
-        read -p "This will delete ALL RECORDS - Are you sure [yN]? " yn; \
-        if [[ ${yn^} == Y ]]; then \
-            q POST "$1/_delete_by_query" -H 'Content-Type: application/json' \
-                 -d '{ "query": { "match_all": {} } }' | pj; \
-        fi; \
-    else \
-        q POST "$1/_delete_by_query" -H 'Content-Type: application/json' \
-             -d '{ "query": { "ids": { "values": [ "'$2'" ] } } }' | pj; \
-    fi \
-    !! cat /tmp/es_idx_list 2>&1 \
+delete entry (de) <index_name> [<_id>] ::
+    if [[ "$2" == "" ]]; then
+        read -p "This will delete ALL RECORDS - Are you sure [yN]? " yn
+        if [[ ${yn^} == Y ]]; then
+            q POST "$1/_delete_by_query" -H 'Content-Type: application/json'
+                 -d '{ "query": { "match_all": {} } }' | pj
+        fi
+    else
+        q POST "$1/_delete_by_query" -H 'Content-Type: application/json'
+             -d '{ "query": { "ids": { "values": [ "'$2'" ] } } }' | pj
+    fi
+    !! cat /tmp/es_idx_list 2>&1
     ## No <id> will mean all documents deleted
 
 
@@ -252,63 +252,63 @@ delete entry (de) <index_name> [<_id>] :: \
 = NODES
 # ----------------------------------------------------------------------------------------------------------------------------------
 
-list nodes (ln) :: \
+list nodes (ln) ::
     q GET "_cat/nodes?v&h=name,ip,nodeRole,m,heapPercent,ramPercent,cpu,load_1m,load_5m,load_15m,disk.total,disk.used_percent&s=name"
 
-list node attributes (lna) :: \
+list node attributes (lna) ::
     q GET "_cat/nodeattrs?v&s=node"
 
-list nodes queries (lnq) :: \
+list nodes queries (lnq) ::
     q GET "_cat/nodes?v&h=name,nodeRole,search,queryTotal,searchFetchTotal,requestCacheHitCount&s=name"
 
-search nodes (sn) :: \
+search nodes (sn) ::
     q GET "_nodes"
 
-node active threads (at) :: \
+node active threads (at) ::
     q GET "_cat/thread_pool?v&s=node_name,name"
 
-node thread pool sizes (tps) :: \
+node thread pool sizes (tps) ::
     q GET "_cat/thread_pool?v&h=node_name,name,size,active,queue,queue_size,largest,min,max&s=node_name,name"
 
-node perf overview (npo) :: \
+node perf overview (npo) ::
     q GET "_cat/nodes?v&h=ip,port,role,master,cpu,ft,ftt,iic,iif,mt,mtt,d,mcs"
 
 # ----------------------------------------------------------------------------------------------------------------------------------
 = SEARCH
 # ----------------------------------------------------------------------------------------------------------------------------------
 
-search (s) <index_name> [<search_term>] :: \
-    if [[ "$2" == "" ]]; then term="*"; else term="$2"; fi; \
-    q GET "$1/_search?q=${term}&pretty" | pj \
+search (s) <index_name> [<search_term>] ::
+    if [[ "$2" == "" ]]; then term="*"; else term="$2"; fi
+    q GET "$1/_search?q=${term}&pretty" | pj
     !! cat /tmp/es_idx_list 2>&1
 
-search json (sj) <index_name> <search_json> :: \
-    q GET "$1/_search?pretty" -H 'Content-Type: application/json' -d "$2" \
+search json (sj) <index_name> <search_json> ::
+    q GET "$1/_search?pretty" -H 'Content-Type: application/json' -d "$2"
     !! cat /tmp/es_idx_list 2>&1
 
-search match (sm) <index_name> <field_name> <value> :: \
-    q GET "$1/_search?pretty" -H 'Content-Type: application/json' -d '{"query": { "match": { "'$2'": "'$3'" } } }' \
+search match (sm) <index_name> <field_name> <value> ::
+    q GET "$1/_search?pretty" -H 'Content-Type: application/json' -d '{"query": { "match": { "'$2'": "'$3'" } } }'
     !! cat /tmp/es_idx_list 2>&1
 
-search term (st) <index_name> <field_name> <value> :: \
-    q GET "$1/_search?pretty" -H 'Content-Type: application/json' -d '{"query": { "term": { "'$2'": "'$3'" } } }' \
+search term (st) <index_name> <field_name> <value> ::
+    q GET "$1/_search?pretty" -H 'Content-Type: application/json' -d '{"query": { "term": { "'$2'": "'$3'" } } }'
     !! cat /tmp/es_idx_list 2>&1
 
-search summary (ss) <index_name> <search_term> :: \
-    q GET "$1/_search?size=0&pretty" -H 'Content-Type: application/json' -d '{"aggs": {"count": {"terms": { "field" : "'$2'", "size" : 100 } } } }' \
+search summary (ss) <index_name> <search_term> ::
+    q GET "$1/_search?size=0&pretty" -H 'Content-Type: application/json' -d '{"aggs": {"count": {"terms": { "field" : "'$2'", "size" : 100 } } } }'
     !! cat /tmp/es_idx_list 2>&1
 
 # ----------------------------------------------------------------------------------------------------------------------------------
 = SQL
 # ----------------------------------------------------------------------------------------------------------------------------------
 
-sql (sql) <sql> :: \
-    q="${1//\"/\\\"}"; \
-    q="${q//\`/\'}"; \
-    echo '{"query": "'"$q"'"}'; \
-    curl -s -X POST "http://$ES_HOST:$ES_PORT/_sql?format=txt" \
-         -H 'Content-Type: application/json' \
-         -d '{"query": "'"$q"'"}' \
+sql (sql) <sql> ::
+    q="${1//\"/\\\"}"
+    q="${q//\`/\'}"
+    echo '{"query": "'"$q"'"}'
+    curl -s -X POST "http://$ES_HOST:$ES_PORT/_sql?format=txt"
+         -H 'Content-Type: application/json'
+         -d '{"query": "'"$q"'"}'
     ## Tips: tablenames in \x22\x22, can use: DESCRIBE \x22<table>\x22
 
 
@@ -316,44 +316,44 @@ sql (sql) <sql> :: \
 = TASKS
 # ----------------------------------------------------------------------------------------------------------------------------------
 
-list tasks (lt) [<sort_field>] :: \
+list tasks (lt) [<sort_field>] ::
     q GET "_cat/tasks?v&h=action,type,start_time,timestamp,running_time,node&s=$1"
 
-list tasks detail (ltd) [<sort_field>] :: \
+list tasks detail (ltd) [<sort_field>] ::
     q GET "_cat/tasks?v&s=$1"
 
 # ----------------------------------------------------------------------------------------------------------------------------------
 = REPOS / SNAPSHOTS
 # ----------------------------------------------------------------------------------------------------------------------------------
 
-add repo (are) <repo_name> <repo_location> [<base_path>] :: \
+add repo (are) <repo_name> <repo_location> [<base_path>] ::
     q PUT "_snapshot/$1?pretty" -H 'Content-Type: application/json' -d '{ "type": "fs", "settings": { "location": "'$2'", "base_path": "'$3'" } } '
 
-delete repo (dre) <repo_name> :: \
-    read -p "Are you sure [yN]? " yn; \
-    if [[ ${yn^} == Y ]]; then \
-         q DELETE "_snapshot/$1?pretty"; \
+delete repo (dre) <repo_name> ::
+    read -p "Are you sure [yN]? " yn
+    if [[ ${yn^} == Y ]]; then
+         q DELETE "_snapshot/$1?pretty"
     fi
 
-list repos (lre) :: \
+list repos (lre) ::
     q GET "_cat/repositories?v"
 
-create snapshot (csn) <repo_name> <snapshot_name> :: \
+create snapshot (csn) <repo_name> <snapshot_name> ::
     q PUT "_snapshot/$1/$2?pretty"
 
-delete snapshot (dsn) <repo_name> <snapshot_name> :: \
-    read -p "Are you sure [yN]? " yn; \
-    if [[ ${yn^} == Y ]]; then \
-         q DELETE "_snapshot/$1/$2?pretty"; \
+delete snapshot (dsn) <repo_name> <snapshot_name> ::
+    read -p "Are you sure [yN]? " yn
+    if [[ ${yn^} == Y ]]; then
+         q DELETE "_snapshot/$1/$2?pretty"
     fi
 
-list snapshots (lsn) :: \
+list snapshots (lsn) ::
     q GET "_cat/snapshots?v"
 
-snapshot details (snd) <repo_name> <snapshot_name> :: \
+snapshot details (snd) <repo_name> <snapshot_name> ::
     q GET "_snapshot/$1/$2?pretty"
 
-restore snaphot (rsn) <repo_name> <snapshot_name> :: \
+restore snaphot (rsn) <repo_name> <snapshot_name> ::
     q POST "_snapshot/$1/$2/_restore?pretty"
 
 # ----------------------------------------------------------------------------------------------------------------------------------
@@ -471,7 +471,7 @@ _es_complete() {
             COMPREPLY=( $(compgen -W "$(cat /tmp/es_idx_list 2>&1)" -- "$cur") )
         fi
         if [[ "$all" == "list indices" || "$prev" == "eli" || "$prev" == "@eli" ]]; then
-            COMPREPLY=( $(compgen -W "$(cat /tmp/es_idx_list 2>&1 )" -- "$cur") )
+            COMPREPLY=( $(compgen -W "$(cat /tmp/es_idx_list 2>&1)" -- "$cur") )
         fi
         if [[ "$all" == "list open" || "$prev" == "elo" || "$prev" == "@elo" ]]; then
             COMPREPLY=( $(compgen -W "$(cat /tmp/es_idx_list 2>&1)" -- "$cur") )
@@ -549,7 +549,7 @@ _es_complete() {
             COMPREPLY=( $(compgen -W "$(cat /tmp/es_idx_list 2>&1)" -- "$cur") )
         fi
         if [[ "$all" == "delete entry" || "$prev" == "ede" || "$prev" == "@ede" ]]; then
-            COMPREPLY=( $(compgen -W "$(cat /tmp/es_idx_list 2>&1 )" -- "$cur") )
+            COMPREPLY=( $(compgen -W "$(cat /tmp/es_idx_list 2>&1)" -- "$cur") )
         fi
         if [[ "$all" == "search" || "$prev" == "es" || "$prev" == "@es" ]]; then
             COMPREPLY=( $(compgen -W "$(cat /tmp/es_idx_list 2>&1)" -- "$cur") )
@@ -666,39 +666,39 @@ if [[ "$1" == "help" || "$1" == "ehe" ]]; then
    usage="\x1b[95mhelp \x1b[96m(ehe)\x1b[97m [filter]\x1b[92m # Show help, optionally filtered by pattern\x1b[0m"
    check_params $# 0 "Usage: $usage"
    
-echo -e "\x1b[92m-------------\x1b[0m"
-echo -e "\x1b[92mElasticsearch\x1b[0m"
-echo -e "\x1b[92m-------------\x1b[0m"
-
-echo -e "\x1b[97mCLI uses environment variables:\x1b[0m"
-echo -e "\x1b[97m- ES_PROTOCOL (default: http),\x1b[0m"
-echo -e "\x1b[97m- ES_HOST (default: localhost)\x1b[0m"
-echo -e "\x1b[97m- ES_PORT (default: 9200),\x1b[0m"
-echo -e "\x1b[97m- ES_PATH (default: <blank>), and\x1b[0m"
-echo -e "\x1b[97m- ES_AUTH (default: <blank> - no auth required)\x1b[0m"
-echo -e "\x1b[97mUse command show settings (ss) to see environment variable values.\x1b[0m"
-
-echo -e "\x1b[95mgenerated:2026-09-08 09:30\x1b[0m"
-echo
-filter="$1"
-if [[ -n "$filter" ]]; then
-  # Show all section headers but only matching commands
-  while IFS= read -r line; do
-    if [[ "$line" =~ ^section= ]]; then
-      # Always show section headers
-      echo -e "\x1b[92m${line#section=}\x1b[0m"
-    elif [[ "$line" =~ usage= ]]; then
-      # Show command if it matches the filter
-      cmd_line="${line#*usage=}"
-      if echo "$cmd_line" | grep -iq "$filter"; then
-        echo -e "   $cmd_line"
-      fi
-    fi
-  done < <(egrep "^section=|^   usage=" "$0" | sed 's/\"//g')
-else
-  # Show everything
-  while IFS= read -r line; do echo -e "${line}${CRESET}"; done < <(egrep "^section=|^   usage=" "$0" | sed "s/.*usage=/   /; s/.*section=/\x1b[92m/; s/\"//g")
-fi
+   echo -e "\x1b[92m-------------\x1b[0m"
+   echo -e "\x1b[92mElasticsearch\x1b[0m"
+   echo -e "\x1b[92m-------------\x1b[0m"
+   
+   echo -e "\x1b[97mCLI uses environment variables:\x1b[0m"
+   echo -e "\x1b[97m- ES_PROTOCOL (default: http),\x1b[0m"
+   echo -e "\x1b[97m- ES_HOST (default: localhost)\x1b[0m"
+   echo -e "\x1b[97m- ES_PORT (default: 9200),\x1b[0m"
+   echo -e "\x1b[97m- ES_PATH (default: <blank>), and\x1b[0m"
+   echo -e "\x1b[97m- ES_AUTH (default: <blank> - no auth required)\x1b[0m"
+   echo -e "\x1b[97mUse command show settings (ss) to see environment variable values.\x1b[0m"
+   
+   echo -e "\x1b[95mgenerated:2026-09-14 17:03\x1b[0m"
+   echo
+   filter="$1"
+   if [[ -n "$filter" ]]; then
+     # Show all section headers but only matching commands
+     while IFS= read -r line; do
+       if [[ "$line" =~ ^section= ]]; then
+         # Always show section headers
+         echo -e "\x1b[92m${line#section=}\x1b[0m"
+       elif [[ "$line" =~ usage= ]]; then
+         # Show command if it matches the filter
+         cmd_line="${line#*usage=}"
+         if echo "$cmd_line" | grep -iq "$filter"; then
+           echo -e "   $cmd_line"
+         fi
+       fi
+     done < <(egrep "^section=|^   usage=" "$0" | sed 's/\"//g')
+   else
+     # Show everything
+     while IFS= read -r line; do echo -e "${line}${CRESET}"; done < <(egrep "^section=|^   usage=" "$0" | sed "s/.*usage=/   /; s/.*section=/\x1b[92m/; s/\"//g")
+   fi
    exit
 fi
 ES_HOST="${ES_HOST:-localhost}"
@@ -707,14 +707,31 @@ if [[ "${ES_PATH%/}" != "" ]]; then ES_PATH="/${ES_PATH%/}"; fi
 ES_PROTOCOL="${ES_PROTOCOL:-http}"
 pj() { if command -v jq >/dev/null 2>&1; then jq .; else cat; fi; }
 cols() { python3 -c 'import sys,json;f=lambda d,p="":[f(v["properties"],p+k+".") if isinstance(v,dict) and "properties" in v else print(p+k) for k,v in d.items()];[f(i["mappings"]["properties"]) for i in json.load(sys.stdin).values()]'; }
-q() { local method="$1"; shift; if [[ "$ES_AUTH" != "" ]]; then ES_AUTH="-u $ES_AUTH"; fi; curl -s -X $method $ES_AUTH $ES_PROTOCOL://$ES_HOST:$ES_PORT$ES_PATH/"$@"; }
+q() {
+local method="$1"
+shift
+if [[ "$ES_AUTH" != "" ]]; then
+    ES_AUTH="-u $ES_AUTH"
+fi
+curl -s -X $method $ES_AUTH $ES_PROTOCOL://$ES_HOST:$ES_PORT$ES_PATH/"$@"
+}
 
 if [[ "$1 $2" == "show settings" || "$1" == "ess" ]]; then
    [[ "$1" == "ess" ]] && shift || shift 2
    usage="\x1b[95mshow settings \x1b[96m(ess)\x1b[97m\x1b[0m"
    check_params $# 0 "Usage: $usage"
-   print_command " echo Environment Variables:; echo ----------------------; echo \"ES_PROTOCOL: $ES_PROTOCOL\"; echo \"ES_HOST:     $ES_HOST\"; echo \"ES_PORT:     $ES_PORT\"; echo \"ES_PATH:     $ES_PATH\"; if [[ \"$ES_AUTH\" == \"\" ]]; then echo \"ES_AUTH:     not set\"; else echo \"ES_AUTH:     is set\"; fi"
-   echo Environment Variables:; echo ----------------------; echo "ES_PROTOCOL: $ES_PROTOCOL"; echo "ES_HOST:     $ES_HOST"; echo "ES_PORT:     $ES_PORT"; echo "ES_PATH:     $ES_PATH"; if [[ "$ES_AUTH" == "" ]]; then echo "ES_AUTH:     not set"; else echo "ES_AUTH:     is set"; fi
+   print_command " echo Environment Variables:; echo ----------------------; echo \"ES_PROTOCOL: $ES_PROTOCOL\"; echo \"ES_HOST:     $ES_HOST\"; echo \"ES_PORT:     $ES_PORT\"; echo \"ES_PATH:     $ES_PATH\"; if [[ \"$ES_AUTH\" == \"\" ]]; then; echo \"ES_AUTH:     not set\"; else; echo \"ES_AUTH:     is set\"; fi"
+   echo Environment Variables:
+   echo ----------------------
+   echo "ES_PROTOCOL: $ES_PROTOCOL"
+   echo "ES_HOST:     $ES_HOST"
+   echo "ES_PORT:     $ES_PORT"
+   echo "ES_PATH:     $ES_PATH"
+   if [[ "$ES_AUTH" == "" ]]; then
+       echo "ES_AUTH:     not set"
+   else
+       echo "ES_AUTH:     is set"
+   fi
    exit
 fi
 section="CLUSTER"
@@ -787,8 +804,15 @@ if [[ "$1 $2" == "list indices" || "$1" == "eli" ]]; then
    [[ "$1" == "eli" ]] && shift || shift 2
    usage="\x1b[95mlist indices \x1b[96m(eli)\x1b[97m [-s] [index_name]\x1b[92m # -s: order by size\x1b[0m"
    check_params $# 0 "Usage: $usage"
-   print_command " if [[ \"$1\" == \"-f\" ]]; then watch es eli; exit; fi; ord=\"index\"; if [[ \"$1\" == \"-s\" ]]; then ord=\"store.size\"; shift; fi; q GET \"_cat/indices/$1?v&h=health,status,index,pri,rep,sc,docs.count,docs.deleted,store.size,pri.store.size&s=$ord\" | tee /tmp/es_idx_list; sed -i 's/^[^ ][^ ]*  *[^ ][^ ]*  *//; s/ .*//' /tmp/es_idx_list"
-   if [[ "$1" == "-f" ]]; then watch es eli; exit; fi; ord="index"; if [[ "$1" == "-s" ]]; then ord="store.size"; shift; fi; q GET "_cat/indices/$1?v&h=health,status,index,pri,rep,sc,docs.count,docs.deleted,store.size,pri.store.size&s=$ord" | tee /tmp/es_idx_list; sed -i 's/^[^ ][^ ]*  *[^ ][^ ]*  *//; s/ .*//' /tmp/es_idx_list
+   print_command " if [[ \"$1\" == \"-f\" ]]; then watch es eli; exit; fi; ord=\"index\"; if [[ \"$1\" == \"-s\" ]]; then; ord=\"store.size\"; shift; fi; q GET \"_cat/indices/$1?v&h=health,status,index,pri,rep,sc,docs.count,docs.deleted,store.size,pri.store.size&s=$ord\" | tee /tmp/es_idx_list; sed -i 's/^[^ ][^ ]*  *[^ ][^ ]*  *//; s/ .*//' /tmp/es_idx_list"
+   if [[ "$1" == "-f" ]]; then watch es eli; exit; fi
+   ord="index"
+   if [[ "$1" == "-s" ]]; then
+       ord="store.size"
+       shift
+   fi
+   q GET "_cat/indices/$1?v&h=health,status,index,pri,rep,sc,docs.count,docs.deleted,store.size,pri.store.size&s=$ord" | tee /tmp/es_idx_list
+   sed -i 's/^[^ ][^ ]*  *[^ ][^ ]*  *//; s/ .*//' /tmp/es_idx_list
    exit
 fi
 
@@ -850,8 +874,10 @@ if [[ "$1 $2 $3 $4 $5" == "list avg segments per shard" || "$1" == "elass" ]]; t
    [[ "$1" == "elass" ]] && shift || shift 5
    usage="\x1b[95mlist avg segments per shard \x1b[96m(elass)\x1b[97m [index_name]\x1b[0m"
    check_params $# 0 "Usage: $usage"
-   print_command " q GET \"_cat/segments/$1?v&s=index,shard,prirep\" | tail -n +2 | sed 's/[[:space:]]\+/ /g' | cut -d ' ' -f1,2 | sort | uniq -c | awk '{c=$1; i=$2; sh=$3; se_c[i]+=c; sh_c[i]++} END {printf \"%-52s Avg Segments\n\",\"Index\"; for (i in se_c) {avg=se_c[i]/sh_c[i]; printf \"%-60s %.2f\n\", i, avg}}' | sort"
-   q GET "_cat/segments/$1?v&s=index,shard,prirep" | tail -n +2 | sed 's/[[:space:]]\+/ /g' | cut -d ' ' -f1,2 | sort | uniq -c | awk '{c=$1; i=$2; sh=$3; se_c[i]+=c; sh_c[i]++} END {printf "%-52s Avg Segments\n","Index"; for (i in se_c) {avg=se_c[i]/sh_c[i]; printf "%-60s %.2f\n", i, avg}}' | sort
+   print_command " q GET \"_cat/segments/$1?v&s=index,shard,prirep\" | tail -n +2 | sed 's/[[:space:]]\+/ /g' | cut -d ' ' -f1,2 |; sort | uniq -c |; awk '{c=$1; i=$2; sh=$3; se_c[i]+=c; sh_c[i]++} END {printf \"%-52s Avg Segments\n\",\"Index\"; for (i in se_c) {avg=se_c[i]/sh_c[i]; printf \"%-60s %.2f\n\", i, avg}}' | sort"
+   q GET "_cat/segments/$1?v&s=index,shard,prirep" | tail -n +2 | sed 's/[[:space:]]\+/ /g' | cut -d ' ' -f1,2 |
+   sort | uniq -c |
+   awk '{c=$1; i=$2; sh=$3; se_c[i]+=c; sh_c[i]++} END {printf "%-52s Avg Segments\n","Index"; for (i in se_c) {avg=se_c[i]/sh_c[i]; printf "%-60s %.2f\n", i, avg}}' | sort
    exit
 fi
 
@@ -868,8 +894,19 @@ if [[ "$1 $2 $3" == "get index mapping" || "$1" == "egim" ]]; then
    [[ "$1" == "egim" ]] && shift || shift 3
    usage="\x1b[95mget index mapping \x1b[96m(egim)\x1b[97m <index_name>\x1b[0m"
    check_params $# 1 "Usage: $usage"
-   print_command " q GET \"$1/_mapping?pretty\" | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n *\([^\"]*\"type\"\)/ \1/g' -e 's/\n *\([^\"]*\"normalizer\"\)/ \1/g' -e 's/\n *\([^\"]*\"index\"\)/ \1/g' -e 's/\n *\([^\"]*\"ignore_above\"\)/ \1/g' -e 's/\n *\([^\"]*\"fields\"\)/ \1/g' -e 's/\n *\([^\"]*\"keyword\"\)/ \1/g' -e 's/\n *\([^\"]*\"raw\"\)/ \1/g' -e 's/\([a-z0-9\"]\) *\n */\1 /g' -e 's/} *\n *}/} }/g' -e 's/} *\n *}/} }/g'"
-   q GET "$1/_mapping?pretty" | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n *\([^"]*"type"\)/ \1/g' -e 's/\n *\([^"]*"normalizer"\)/ \1/g' -e 's/\n *\([^"]*"index"\)/ \1/g' -e 's/\n *\([^"]*"ignore_above"\)/ \1/g' -e 's/\n *\([^"]*"fields"\)/ \1/g' -e 's/\n *\([^"]*"keyword"\)/ \1/g' -e 's/\n *\([^"]*"raw"\)/ \1/g' -e 's/\([a-z0-9"]\) *\n */\1 /g' -e 's/} *\n *}/} }/g' -e 's/} *\n *}/} }/g'
+   print_command " q GET \"$1/_mapping?pretty\" |; sed -e ':a' -e 'N' -e '$!ba'; -e 's/\n *\([^\"]*\"type\"\)/ \1/g'; -e 's/\n *\([^\"]*\"normalizer\"\)/ \1/g'; -e 's/\n *\([^\"]*\"index\"\)/ \1/g'; -e 's/\n *\([^\"]*\"ignore_above\"\)/ \1/g'; -e 's/\n *\([^\"]*\"fields\"\)/ \1/g'; -e 's/\n *\([^\"]*\"keyword\"\)/ \1/g'; -e 's/\n *\([^\"]*\"raw\"\)/ \1/g'; -e 's/\([a-z0-9\"]\) *\n */\1 /g'; -e 's/} *\n *}/} }/g'; -e 's/} *\n *}/} }/g'"
+   q GET "$1/_mapping?pretty" |
+   sed -e ':a' -e 'N' -e '$!ba'
+      -e 's/\n *\([^"]*"type"\)/ \1/g'
+      -e 's/\n *\([^"]*"normalizer"\)/ \1/g'
+      -e 's/\n *\([^"]*"index"\)/ \1/g'
+      -e 's/\n *\([^"]*"ignore_above"\)/ \1/g'
+      -e 's/\n *\([^"]*"fields"\)/ \1/g'
+      -e 's/\n *\([^"]*"keyword"\)/ \1/g'
+      -e 's/\n *\([^"]*"raw"\)/ \1/g'
+      -e 's/\([a-z0-9"]\) *\n */\1 /g'
+      -e 's/} *\n *}/} }/g'
+      -e 's/} *\n *}/} }/g'
    exit
 fi
 
@@ -905,8 +942,11 @@ if [[ "$1 $2 $3 $4" == "remove index from alias" || "$1" == "erifa" ]]; then
    [[ "$1" == "erifa" ]] && shift || shift 4
    usage="\x1b[95mremove index from alias \x1b[96m(erifa)\x1b[97m <index_name> <alias_name>\x1b[0m"
    check_params $# 2 "Usage: $usage"
-   print_command " read -p \"Are you sure [yN]? \" yn; if [[ ${yn^} == Y ]]; then q DELETE \"$1/_aliases/$2\"; fi"
-   read -p "Are you sure [yN]? " yn; if [[ ${yn^} == Y ]]; then q DELETE "$1/_aliases/$2"; fi
+   print_command " read -p \"Are you sure [yN]? \" yn; if [[ ${yn^} == Y ]]; then; q DELETE \"$1/_aliases/$2\"; fi"
+   read -p "Are you sure [yN]? " yn
+   if [[ ${yn^} == Y ]]; then
+        q DELETE "$1/_aliases/$2"
+   fi
    exit
 fi
 
@@ -941,8 +981,11 @@ if [[ "$1 $2" == "delete index" || "$1" == "edi" ]]; then
    [[ "$1" == "edi" ]] && shift || shift 2
    usage="\x1b[95mdelete index \x1b[96m(edi)\x1b[97m <index_name>\x1b[0m"
    check_params $# 1 "Usage: $usage"
-   print_command " read -p \"Are you sure [yN]? \" yn; if [[ ${yn^} == Y ]]; then q DELETE \"$1\"; fi"
-   read -p "Are you sure [yN]? " yn; if [[ ${yn^} == Y ]]; then q DELETE "$1"; fi
+   print_command " read -p \"Are you sure [yN]? \" yn; if [[ ${yn^} == Y ]]; then; q DELETE \"$1\"; fi"
+   read -p "Are you sure [yN]? " yn
+   if [[ ${yn^} == Y ]]; then
+        q DELETE "$1"
+   fi
    exit
 fi
 
@@ -1059,8 +1102,17 @@ if [[ "$1 $2" == "delete entry" || "$1" == "ede" ]]; then
    [[ "$1" == "ede" ]] && shift || shift 2
    usage="\x1b[95mdelete entry \x1b[96m(ede)\x1b[97m <index_name> [_id]\x1b[92m # No <id> will mean all documents deleted\x1b[0m"
    check_params $# 1 "Usage: $usage"
-   print_command " if [[ \"$2\" == \"\" ]]; then read -p \"This will delete ALL RECORDS - Are you sure [yN]? \" yn; if [[ ${yn^} == Y ]]; then q POST \"$1/_delete_by_query\" -H 'Content-Type: application/json' -d '{ \"query\": { \"match_all\": {} } }' | pj; fi; else q POST \"$1/_delete_by_query\" -H 'Content-Type: application/json' -d '{ \"query\": { \"ids\": { \"values\": [ \"'$2'\" ] } } }' | pj; fi"
-   if [[ "$2" == "" ]]; then read -p "This will delete ALL RECORDS - Are you sure [yN]? " yn; if [[ ${yn^} == Y ]]; then q POST "$1/_delete_by_query" -H 'Content-Type: application/json' -d '{ "query": { "match_all": {} } }' | pj; fi; else q POST "$1/_delete_by_query" -H 'Content-Type: application/json' -d '{ "query": { "ids": { "values": [ "'$2'" ] } } }' | pj; fi
+   print_command " if [[ \"$2\" == \"\" ]]; then; read -p \"This will delete ALL RECORDS - Are you sure [yN]? \" yn; if [[ ${yn^} == Y ]]; then; q POST \"$1/_delete_by_query\" -H 'Content-Type: application/json'; -d '{ \"query\": { \"match_all\": {} } }' | pj; fi; else; q POST \"$1/_delete_by_query\" -H 'Content-Type: application/json'; -d '{ \"query\": { \"ids\": { \"values\": [ \"'$2'\" ] } } }' | pj; fi"
+   if [[ "$2" == "" ]]; then
+       read -p "This will delete ALL RECORDS - Are you sure [yN]? " yn
+       if [[ ${yn^} == Y ]]; then
+           q POST "$1/_delete_by_query" -H 'Content-Type: application/json'
+                -d '{ "query": { "match_all": {} } }' | pj
+       fi
+   else
+       q POST "$1/_delete_by_query" -H 'Content-Type: application/json'
+            -d '{ "query": { "ids": { "values": [ "'$2'" ] } } }' | pj
+   fi
    exit
 fi
 section="NODES"
@@ -1134,7 +1186,8 @@ if [[ "$1" == "search" || "$1" == "es" ]]; then
    usage="\x1b[95msearch \x1b[96m(es)\x1b[97m <index_name> [search_term]\x1b[0m"
    check_params $# 1 "Usage: $usage"
    print_command " if [[ \"$2\" == \"\" ]]; then term=\"*\"; else term=\"$2\"; fi; q GET \"$1/_search?q=${term}&pretty\" | pj"
-   if [[ "$2" == "" ]]; then term="*"; else term="$2"; fi; q GET "$1/_search?q=${term}&pretty" | pj
+   if [[ "$2" == "" ]]; then term="*"; else term="$2"; fi
+   q GET "$1/_search?q=${term}&pretty" | pj
    exit
 fi
 
@@ -1179,8 +1232,13 @@ if [[ "$1" == "sql" || "$1" == "esql" ]]; then
    [[ "$1" == "esql" ]] && shift || shift 1
    usage="\x1b[95msql \x1b[96m(esql)\x1b[97m <sql>\x1b[92m # Tips: tablenames in \x22\x22, can use: DESCRIBE \x22<table>\x22\x1b[0m"
    check_params $# 1 "Usage: $usage"
-   print_command " q=\"${1//\\"/\\\\"}\"; q=\"${q//\`/\'}\"; echo '{\"query\": \"'\"$q\"'\"}'; curl -s -X POST \"http://$ES_HOST:$ES_PORT/_sql?format=txt\" -H 'Content-Type: application/json' -d '{\"query\": \"'\"$q\"'\"}'"
-   q="${1//\"/\\\"}"; q="${q//\`/\'}"; echo '{"query": "'"$q"'"}'; curl -s -X POST "http://$ES_HOST:$ES_PORT/_sql?format=txt" -H 'Content-Type: application/json' -d '{"query": "'"$q"'"}'
+   print_command " q=\"${1//\\"/\\\\"}\"; q=\"${q//\`/\'}\"; echo '{\"query\": \"'\"$q\"'\"}'; curl -s -X POST \"http://$ES_HOST:$ES_PORT/_sql?format=txt\"; -H 'Content-Type: application/json'; -d '{\"query\": \"'\"$q\"'\"}'"
+   q="${1//\"/\\\"}"
+   q="${q//\`/\'}"
+   echo '{"query": "'"$q"'"}'
+   curl -s -X POST "http://$ES_HOST:$ES_PORT/_sql?format=txt"
+        -H 'Content-Type: application/json'
+        -d '{"query": "'"$q"'"}'
    exit
 fi
 section="TASKS"
@@ -1217,8 +1275,11 @@ if [[ "$1 $2" == "delete repo" || "$1" == "edre" ]]; then
    [[ "$1" == "edre" ]] && shift || shift 2
    usage="\x1b[95mdelete repo \x1b[96m(edre)\x1b[97m <repo_name>\x1b[0m"
    check_params $# 1 "Usage: $usage"
-   print_command " read -p \"Are you sure [yN]? \" yn; if [[ ${yn^} == Y ]]; then q DELETE \"_snapshot/$1?pretty\"; fi"
-   read -p "Are you sure [yN]? " yn; if [[ ${yn^} == Y ]]; then q DELETE "_snapshot/$1?pretty"; fi
+   print_command " read -p \"Are you sure [yN]? \" yn; if [[ ${yn^} == Y ]]; then; q DELETE \"_snapshot/$1?pretty\"; fi"
+   read -p "Are you sure [yN]? " yn
+   if [[ ${yn^} == Y ]]; then
+        q DELETE "_snapshot/$1?pretty"
+   fi
    exit
 fi
 
@@ -1244,8 +1305,11 @@ if [[ "$1 $2" == "delete snapshot" || "$1" == "edsn" ]]; then
    [[ "$1" == "edsn" ]] && shift || shift 2
    usage="\x1b[95mdelete snapshot \x1b[96m(edsn)\x1b[97m <repo_name> <snapshot_name>\x1b[0m"
    check_params $# 2 "Usage: $usage"
-   print_command " read -p \"Are you sure [yN]? \" yn; if [[ ${yn^} == Y ]]; then q DELETE \"_snapshot/$1/$2?pretty\"; fi"
-   read -p "Are you sure [yN]? " yn; if [[ ${yn^} == Y ]]; then q DELETE "_snapshot/$1/$2?pretty"; fi
+   print_command " read -p \"Are you sure [yN]? \" yn; if [[ ${yn^} == Y ]]; then; q DELETE \"_snapshot/$1/$2?pretty\"; fi"
+   read -p "Are you sure [yN]? " yn
+   if [[ ${yn^} == Y ]]; then
+        q DELETE "_snapshot/$1/$2?pretty"
+   fi
    exit
 fi
 

@@ -12,7 +12,7 @@ The definition file contains command definitions for the CLI builder.
 = ALL
 # -------------------------------------------------------------------------------------------------
 
-get all (ga) [<namespace>] :: \
+get all (ga) [<namespace>] ::
     if [[ "$1" == "" ]]; then kubectl get all -A; else kubectl get all -n $1; fi
 
 get (g) <item> :: kubectl get $1
@@ -21,7 +21,7 @@ get (g) <item> :: kubectl get $1
 = LOGS
 # -------------------------------------------------------------------------------------------------
 
-logs (l) <pod_name> [<namespace>] :: \
+logs (l) <pod_name> [<namespace>] ::
     if [[ "$2" == "" ]]; then kubectl logs $1; else kubectl logs $1 -n $2; fi
 
 # -------------------------------------------------------------------------------------------------
@@ -34,38 +34,38 @@ get node (gn) :: kubectl get nodes
 = PODS
 # -------------------------------------------------------------------------------------------------
 
-get pods (gp) [<namespace>] :: \
+get pods (gp) [<namespace>] ::
     if [[ "$1" == "" ]]; then kubectl get pods -A; else kubectl get pods -n $1; fi
 
-delete pod (dp) <pod_name> [<namespace>] :: \
+delete pod (dp) <pod_name> [<namespace>] ::
     if [[ "$2" != "" ]]; then kubectl delete pod $1 -n $2; else kubectl delete pod $1; fi
 
 # -------------------------------------------------------------------------------------------------
 = PERSISTENT VOLUMES
 # -------------------------------------------------------------------------------------------------
 
-get persistent volumes (gpv) [<namespace>] :: \
-    if [[ "$1" == "" ]]; then kubectl get pv -A; \
+get persistent volumes (gpv) [<namespace>] ::
+    if [[ "$1" == "" ]]; then kubectl get pv -A
     else kubectl get pv -n $1; fi
 
 # -------------------------------------------------------------------------------------------------
 = PERSISTENT VOLUME CLAIMS
 # -------------------------------------------------------------------------------------------------
 
-get persistent volume claims (gpvc) [<namespace>] :: \
-    if [[ "$1" == "" ]]; then kubectl get pvc -A; \
+get persistent volume claims (gpvc) [<namespace>] ::
+    if [[ "$1" == "" ]]; then kubectl get pvc -A
     else kubectl get pvc -n $1; fi
 
 # -------------------------------------------------------------------------------------------------
 = SECRETS
 # -------------------------------------------------------------------------------------------------
 
-get secrets (gse) [<namespace>] :: \
-    if [[ "$1" == "" ]]; then kubectl get secrets -A; \
+get secrets (gse) [<namespace>] ::
+    if [[ "$1" == "" ]]; then kubectl get secrets -A
     else kubectl get secrets -n $1; fi
 
-delete service (dse) <secret_name> [<namespace>] :: \
-    if [[ "$2" != "" ]]; then kubectl delete secret $1 -n $2; \
+delete service (dse) <secret_name> [<namespace>] ::
+    if [[ "$2" != "" ]]; then kubectl delete secret $1 -n $2
     else kubectl delete secret $1; fi
 
 # kubectl get secret mdm-elasticsearch-es-elastic-user -n elastic -o jsonpath='{.data.elastic}' | base64 --decode
@@ -74,24 +74,25 @@ delete service (dse) <secret_name> [<namespace>] :: \
 = SERVICES
 # -------------------------------------------------------------------------------------------------
 
-get services (gs) [<namespace>] :: \
-    if [[ "$1" == "" ]]; then kubectl get svc -A; \
+get services (gs) [<namespace>] ::
+    if [[ "$1" == "" ]]; then kubectl get svc -A
     else kubectl get svc -n $1; fi
 
-delete service (ds) <service_name> [<namespace>] :: \
-    if [[ "$2" != "" ]]; then kubectl delete svc $1 -n $2; \
+delete service (ds) <service_name> [<namespace>] ::
+    if [[ "$2" != "" ]]; then kubectl delete svc $1 -n $2
     else kubectl delete svc $1; fi
 
 # -------------------------------------------------------------------------------------------------
 = STATEFULSETS
 # -------------------------------------------------------------------------------------------------
 
-get statefulset (gss) [<namespace>] :: \
+get statefulset (gss) [<namespace>] ::
     if [[ "$1" == "" ]]; then kubectl get statefulset -A; else kubectl get statefulset -n $1; fi
 
-delete statefulset (dss) <statefulset_name> [<namespace>] :: \
-    if [[ "$2" != "" ]]; then kubectl delete statefulset $1 -n $2; \
-    else kubectl delete statefulset $1; fi```
+delete statefulset (dss) <statefulset_name> [<namespace>] ::
+    if [[ "$2" != "" ]]; then kubectl delete statefulset $1 -n $2
+    else kubectl delete statefulset $1; fi
+```
 
 ## Alias file
 
@@ -169,27 +170,27 @@ if [[ "$1" == "help" || "$1" == "khe" ]]; then
    usage="\x1b[95mhelp \x1b[96m(khe)\x1b[97m [filter]\x1b[92m # Show help, optionally filtered by pattern\x1b[0m"
    check_params $# 0 "Usage: $usage"
    
-echo -e "\x1b[95mgenerated:2026-09-08 09:30\x1b[0m"
-echo
-filter="$1"
-if [[ -n "$filter" ]]; then
-  # Show all section headers but only matching commands
-  while IFS= read -r line; do
-    if [[ "$line" =~ ^section= ]]; then
-      # Always show section headers
-      echo -e "\x1b[92m${line#section=}\x1b[0m"
-    elif [[ "$line" =~ usage= ]]; then
-      # Show command if it matches the filter
-      cmd_line="${line#*usage=}"
-      if echo "$cmd_line" | grep -iq "$filter"; then
-        echo -e "   $cmd_line"
-      fi
-    fi
-  done < <(egrep "^section=|^   usage=" "$0" | sed 's/\"//g')
-else
-  # Show everything
-  while IFS= read -r line; do echo -e "${line}${CRESET}"; done < <(egrep "^section=|^   usage=" "$0" | sed "s/.*usage=/   /; s/.*section=/\x1b[92m/; s/\"//g")
-fi
+   echo -e "\x1b[95mgenerated:2026-09-14 17:03\x1b[0m"
+   echo
+   filter="$1"
+   if [[ -n "$filter" ]]; then
+     # Show all section headers but only matching commands
+     while IFS= read -r line; do
+       if [[ "$line" =~ ^section= ]]; then
+         # Always show section headers
+         echo -e "\x1b[92m${line#section=}\x1b[0m"
+       elif [[ "$line" =~ usage= ]]; then
+         # Show command if it matches the filter
+         cmd_line="${line#*usage=}"
+         if echo "$cmd_line" | grep -iq "$filter"; then
+           echo -e "   $cmd_line"
+         fi
+       fi
+     done < <(egrep "^section=|^   usage=" "$0" | sed 's/\"//g')
+   else
+     # Show everything
+     while IFS= read -r line; do echo -e "${line}${CRESET}"; done < <(egrep "^section=|^   usage=" "$0" | sed "s/.*usage=/   /; s/.*section=/\x1b[92m/; s/\"//g")
+   fi
    exit
 fi
 section="ALL"
@@ -257,7 +258,8 @@ if [[ "$1 $2 $3" == "get persistent volumes" || "$1" == "kgpv" ]]; then
    usage="\x1b[95mget persistent volumes \x1b[96m(kgpv)\x1b[97m [namespace]\x1b[0m"
    check_params $# 0 "Usage: $usage"
    print_command " if [[ \"$1\" == \"\" ]]; then kubectl get pv -A; else kubectl get pv -n $1; fi"
-   if [[ "$1" == "" ]]; then kubectl get pv -A; else kubectl get pv -n $1; fi
+   if [[ "$1" == "" ]]; then kubectl get pv -A
+   else kubectl get pv -n $1; fi
    exit
 fi
 section="PERSISTENT VOLUME CLAIMS"
@@ -267,7 +269,8 @@ if [[ "$1 $2 $3 $4" == "get persistent volume claims" || "$1" == "kgpvc" ]]; the
    usage="\x1b[95mget persistent volume claims \x1b[96m(kgpvc)\x1b[97m [namespace]\x1b[0m"
    check_params $# 0 "Usage: $usage"
    print_command " if [[ \"$1\" == \"\" ]]; then kubectl get pvc -A; else kubectl get pvc -n $1; fi"
-   if [[ "$1" == "" ]]; then kubectl get pvc -A; else kubectl get pvc -n $1; fi
+   if [[ "$1" == "" ]]; then kubectl get pvc -A
+   else kubectl get pvc -n $1; fi
    exit
 fi
 section="SECRETS"
@@ -277,7 +280,8 @@ if [[ "$1 $2" == "get secrets" || "$1" == "kgse" ]]; then
    usage="\x1b[95mget secrets \x1b[96m(kgse)\x1b[97m [namespace]\x1b[0m"
    check_params $# 0 "Usage: $usage"
    print_command " if [[ \"$1\" == \"\" ]]; then kubectl get secrets -A; else kubectl get secrets -n $1; fi"
-   if [[ "$1" == "" ]]; then kubectl get secrets -A; else kubectl get secrets -n $1; fi
+   if [[ "$1" == "" ]]; then kubectl get secrets -A
+   else kubectl get secrets -n $1; fi
    exit
 fi
 
@@ -286,7 +290,8 @@ if [[ "$1 $2" == "delete service" || "$1" == "kdse" ]]; then
    usage="\x1b[95mdelete service \x1b[96m(kdse)\x1b[97m <secret_name> [namespace]\x1b[0m"
    check_params $# 1 "Usage: $usage"
    print_command " if [[ \"$2\" != \"\" ]]; then kubectl delete secret $1 -n $2; else kubectl delete secret $1; fi"
-   if [[ "$2" != "" ]]; then kubectl delete secret $1 -n $2; else kubectl delete secret $1; fi
+   if [[ "$2" != "" ]]; then kubectl delete secret $1 -n $2
+   else kubectl delete secret $1; fi
    exit
 fi
 section="SERVICES"
@@ -296,7 +301,8 @@ if [[ "$1 $2" == "get services" || "$1" == "kgs" ]]; then
    usage="\x1b[95mget services \x1b[96m(kgs)\x1b[97m [namespace]\x1b[0m"
    check_params $# 0 "Usage: $usage"
    print_command " if [[ \"$1\" == \"\" ]]; then kubectl get svc -A; else kubectl get svc -n $1; fi"
-   if [[ "$1" == "" ]]; then kubectl get svc -A; else kubectl get svc -n $1; fi
+   if [[ "$1" == "" ]]; then kubectl get svc -A
+   else kubectl get svc -n $1; fi
    exit
 fi
 
@@ -305,7 +311,8 @@ if [[ "$1 $2" == "delete service" || "$1" == "kds" ]]; then
    usage="\x1b[95mdelete service \x1b[96m(kds)\x1b[97m <service_name> [namespace]\x1b[0m"
    check_params $# 1 "Usage: $usage"
    print_command " if [[ \"$2\" != \"\" ]]; then kubectl delete svc $1 -n $2; else kubectl delete svc $1; fi"
-   if [[ "$2" != "" ]]; then kubectl delete svc $1 -n $2; else kubectl delete svc $1; fi
+   if [[ "$2" != "" ]]; then kubectl delete svc $1 -n $2
+   else kubectl delete svc $1; fi
    exit
 fi
 section="STATEFULSETS"
@@ -324,7 +331,8 @@ if [[ "$1 $2" == "delete statefulset" || "$1" == "kdss" ]]; then
    usage="\x1b[95mdelete statefulset \x1b[96m(kdss)\x1b[97m <statefulset_name> [namespace]\x1b[0m"
    check_params $# 1 "Usage: $usage"
    print_command " if [[ \"$2\" != \"\" ]]; then kubectl delete statefulset $1 -n $2; else kubectl delete statefulset $1; fi"
-   if [[ "$2" != "" ]]; then kubectl delete statefulset $1 -n $2; else kubectl delete statefulset $1; fi
+   if [[ "$2" != "" ]]; then kubectl delete statefulset $1 -n $2
+   else kubectl delete statefulset $1; fi
    exit
 fi
 

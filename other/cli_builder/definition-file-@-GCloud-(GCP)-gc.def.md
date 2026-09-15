@@ -10,26 +10,26 @@ The definition file contains command definitions for the CLI builder.
 
 cmd if [[ "$GCP_PROJECT" != "" ]]; then GCP_PROJECT="--project $GCP_PROJECT"; fi
 
-cmd gc() { \
-    echo PROJ: $GCP_PROJECT; \
-    gcloud "$@" $GCP_PROJECT; \
-}
+cmd gc() {
+    echo PROJ: $GCP_PROJECT
+    gcloud "$@" $GCP_PROJECT
+    }
 
 # --------------------------------------------------------------------------------
 = Config
 # --------------------------------------------------------------------------------
 
-auth login (al) [-a] :: \
-    if [[ "$1" == "-a" ]]; then gcloud auth application-default login --no-launch-browser; \
-    else gcloud auth login --no-launch-browser; \
-    fi \
+auth login (al) [-a] ::
+    if [[ "$1" == "-a" ]]; then gcloud auth application-default login --no-launch-browser
+    else gcloud auth login --no-launch-browser
+    fi
     ## auth login with --no-launch-browser. -a: adds application-default
 
-auth reset (ar) :: \
-    gcloud auth revoke $EMAIL; \
-    gcloud auth application-default revoke; \
-    gcloud auth application-default login; \
-    gcloud auth login \
+auth reset (ar) ::
+    gcloud auth revoke $EMAIL
+    gcloud auth application-default revoke
+    gcloud auth application-default login
+    gcloud auth login
     ## Full reset of gcloud auth when having issues
 
 config list (cl) :: gcloud config list
@@ -42,21 +42,21 @@ project get (pg) :: gcloud config get project
 
 project list (pl) :: gcloud projects list
 
-project set (ps) :: \
-    echo "Available GCP Projects:" && \
-    gcloud projects list --format="table[no-heading](projectId,name)" | \
-    awk '{printf "%d. %s (%s)\n", NR, $1, substr($0, index($0,$2))}' | \
-    tee /tmp/projects.txt && \
-    read -p $'\nEnter project number: ' num && \
-    project=$(sed -n "${num}p" /tmp/projects.txt | awk '{print $2}') && \
-    gcloud config set project "$project" && \
+project set (ps) ::
+    echo "Available GCP Projects:" &&
+    gcloud projects list --format="table[no-heading](projectId,name)" |
+    awk '{printf "%d. %s (%s)\n", NR, $1, substr($0, index($0,$2))}' |
+    tee /tmp/projects.txt &&
+    read -p $'\nEnter project number: ' num &&
+    project=$(sed -n "${num}p" /tmp/projects.txt | awk '{print $2}') &&
+    gcloud config set project "$project" &&
     echo "Project set to: $project"
 
 # --------------------------------------------------------------------------------
 = Compute Engine (GCE)
 # --------------------------------------------------------------------------------
 
-compute instances list (cil) :: gc compute instances list 
+compute instances list (cil) :: gc compute instances list
 
 # --------------------------------------------------------------------------------
 = Kubernetes/Containers
@@ -135,35 +135,38 @@ if [[ "$1" == "help" || "$1" == "ghe" ]]; then
    usage="\x1b[95mhelp \x1b[96m(ghe)\x1b[97m [filter]\x1b[92m # Show help, optionally filtered by pattern\x1b[0m"
    check_params $# 0 "Usage: $usage"
    
-echo -e "\x1b[92m------------\x1b[0m"
-echo -e "\x1b[92mGCloud (GCP)\x1b[0m"
-echo -e "\x1b[92m------------\x1b[0m"
-
-echo -e "\x1b[95mgenerated:2026-09-08 09:30\x1b[0m"
-echo
-filter="$1"
-if [[ -n "$filter" ]]; then
-  # Show all section headers but only matching commands
-  while IFS= read -r line; do
-    if [[ "$line" =~ ^section= ]]; then
-      # Always show section headers
-      echo -e "\x1b[92m${line#section=}\x1b[0m"
-    elif [[ "$line" =~ usage= ]]; then
-      # Show command if it matches the filter
-      cmd_line="${line#*usage=}"
-      if echo "$cmd_line" | grep -iq "$filter"; then
-        echo -e "   $cmd_line"
-      fi
-    fi
-  done < <(egrep "^section=|^   usage=" "$0" | sed 's/\"//g')
-else
-  # Show everything
-  while IFS= read -r line; do echo -e "${line}${CRESET}"; done < <(egrep "^section=|^   usage=" "$0" | sed "s/.*usage=/   /; s/.*section=/\x1b[92m/; s/\"//g")
-fi
+   echo -e "\x1b[92m------------\x1b[0m"
+   echo -e "\x1b[92mGCloud (GCP)\x1b[0m"
+   echo -e "\x1b[92m------------\x1b[0m"
+   
+   echo -e "\x1b[95mgenerated:2026-09-14 17:03\x1b[0m"
+   echo
+   filter="$1"
+   if [[ -n "$filter" ]]; then
+     # Show all section headers but only matching commands
+     while IFS= read -r line; do
+       if [[ "$line" =~ ^section= ]]; then
+         # Always show section headers
+         echo -e "\x1b[92m${line#section=}\x1b[0m"
+       elif [[ "$line" =~ usage= ]]; then
+         # Show command if it matches the filter
+         cmd_line="${line#*usage=}"
+         if echo "$cmd_line" | grep -iq "$filter"; then
+           echo -e "   $cmd_line"
+         fi
+       fi
+     done < <(egrep "^section=|^   usage=" "$0" | sed 's/\"//g')
+   else
+     # Show everything
+     while IFS= read -r line; do echo -e "${line}${CRESET}"; done < <(egrep "^section=|^   usage=" "$0" | sed "s/.*usage=/   /; s/.*section=/\x1b[92m/; s/\"//g")
+   fi
    exit
 fi
 if [[ "$GCP_PROJECT" != "" ]]; then GCP_PROJECT="--project $GCP_PROJECT"; fi
-gc() { echo PROJ: $GCP_PROJECT; gcloud "$@" $GCP_PROJECT; }
+gc() {
+echo PROJ: $GCP_PROJECT
+gcloud "$@" $GCP_PROJECT
+}
 section="Config"
 
 if [[ "$1 $2" == "auth login" || "$1" == "gal" ]]; then
@@ -171,7 +174,9 @@ if [[ "$1 $2" == "auth login" || "$1" == "gal" ]]; then
    usage="\x1b[95mauth login \x1b[96m(gal)\x1b[97m [-a]\x1b[92m # auth login with --no-launch-browser. -a: adds application-default\x1b[0m"
    check_params $# 0 "Usage: $usage"
    print_command " if [[ \"$1\" == \"-a\" ]]; then gcloud auth application-default login --no-launch-browser; else gcloud auth login --no-launch-browser; fi"
-   if [[ "$1" == "-a" ]]; then gcloud auth application-default login --no-launch-browser; else gcloud auth login --no-launch-browser; fi
+   if [[ "$1" == "-a" ]]; then gcloud auth application-default login --no-launch-browser
+   else gcloud auth login --no-launch-browser
+   fi
    exit
 fi
 
@@ -180,7 +185,10 @@ if [[ "$1 $2" == "auth reset" || "$1" == "gar" ]]; then
    usage="\x1b[95mauth reset \x1b[96m(gar)\x1b[97m\x1b[92m # Full reset of gcloud auth when having issues\x1b[0m"
    check_params $# 0 "Usage: $usage"
    print_command " gcloud auth revoke $EMAIL; gcloud auth application-default revoke; gcloud auth application-default login; gcloud auth login"
-   gcloud auth revoke $EMAIL; gcloud auth application-default revoke; gcloud auth application-default login; gcloud auth login
+   gcloud auth revoke $EMAIL
+   gcloud auth application-default revoke
+   gcloud auth application-default login
+   gcloud auth login
    exit
 fi
 
@@ -216,8 +224,15 @@ if [[ "$1 $2" == "project set" || "$1" == "gps" ]]; then
    [[ "$1" == "gps" ]] && shift || shift 2
    usage="\x1b[95mproject set \x1b[96m(gps)\x1b[97m\x1b[0m"
    check_params $# 0 "Usage: $usage"
-   print_command " echo \"Available GCP Projects:\" && gcloud projects list --format=\"table[no-heading](projectId,name)\" | awk '{printf \"%d. %s (%s)\n\", NR, $1, substr($0, index($0,$2))}' | tee /tmp/projects.txt && read -p $'\nEnter project number: ' num && project=$(sed -n \"${num}p\" /tmp/projects.txt | awk '{print $2}') && gcloud config set project \"$project\" && echo \"Project set to: $project\""
-   echo "Available GCP Projects:" && gcloud projects list --format="table[no-heading](projectId,name)" | awk '{printf "%d. %s (%s)\n", NR, $1, substr($0, index($0,$2))}' | tee /tmp/projects.txt && read -p $'\nEnter project number: ' num && project=$(sed -n "${num}p" /tmp/projects.txt | awk '{print $2}') && gcloud config set project "$project" && echo "Project set to: $project"
+   print_command " echo \"Available GCP Projects:\" &&; gcloud projects list --format=\"table[no-heading](projectId,name)\" |; awk '{printf \"%d. %s (%s)\n\", NR, $1, substr($0, index($0,$2))}' |; tee /tmp/projects.txt &&; read -p $'\nEnter project number: ' num &&; project=$(sed -n \"${num}p\" /tmp/projects.txt | awk '{print $2}') &&; gcloud config set project \"$project\" &&; echo \"Project set to: $project\""
+   echo "Available GCP Projects:" &&
+   gcloud projects list --format="table[no-heading](projectId,name)" |
+   awk '{printf "%d. %s (%s)\n", NR, $1, substr($0, index($0,$2))}' |
+   tee /tmp/projects.txt &&
+   read -p $'\nEnter project number: ' num &&
+   project=$(sed -n "${num}p" /tmp/projects.txt | awk '{print $2}') &&
+   gcloud config set project "$project" &&
+   echo "Project set to: $project"
    exit
 fi
 section="Compute Engine (GCE)"
