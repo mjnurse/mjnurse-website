@@ -37,7 +37,7 @@ The notes captured in the Linux notes tool = `n`.
 ### awk
 
 <table>
-<tr><td><code>cmd \|\| awk '{print $1, $3}'</code></td><td>print 1st and 3rd space separated columns</td></tr>
+<tr><td><code>cmd \\|\\| awk '{print $1, $3}'</code></td><td>print 1st and 3rd space separated columns</td></tr>
 </table>
 
 ### bash
@@ -119,14 +119,14 @@ The notes captured in the Linux notes tool = `n`.
 ### jq
 
 <table>
-<tr><td><code>jq '. \| length'</code></td><td>Count</td></tr>
+<tr><td><code>jq '. \\| length'</code></td><td>Count</td></tr>
 <tr><td><code>jq '.[0]'</code></td><td>Array item</td></tr>
-<tr><td><code>jq '.[] \| select(x == "y")'</code></td><td>Filter</td></tr>
-<tr><td><code>jq '.[] \| {a, b}'</code></td><td>Pick fields</td></tr>
+<tr><td><code>jq '.[] \\| select(x == "y")'</code></td><td>Filter</td></tr>
+<tr><td><code>jq '.[] \\| {a, b}'</code></td><td>Pick fields</td></tr>
 <tr><td><code>jq '.[]'</code></td><td>Loop array</td></tr>
 <tr><td><code>jq '.a.b.c'</code></td><td>Nested field</td></tr>
 <tr><td><code>jq '.field'</code></td><td>Get a field</td></tr>
-<tr><td><code>jq -r '.field'</code></td><td>Raw output </td></tr>
+<tr><td><code>jq -r '.field'</code></td><td>Raw output</td></tr>
 </table>
 
 ### ln
@@ -142,7 +142,7 @@ The notes captured in the Linux notes tool = `n`.
 <tr><td><code>SET search_path TO &lt;schema name&gt;;</code></td><td>Alter the schema searched.</td></tr>
 <tr><td><code>SHOW search_path;</code></td><td>show the currently search schema.</td></tr>
 <tr><td><code>export PGPASSWORD=postgres</code></td><td>Set password</td></tr>
-<tr><td><code>export PGPASSWORD=postgres; cat my.sql \| psql -h localhost -U postgres -d postgres</code></td><td>Run my.sql</td></tr>
+<tr><td><code>export PGPASSWORD=postgres; cat my.sql \\| psql -h localhost -U postgres -d postgres</code></td><td>Run my.sql</td></tr>
 </table>
 
 ### ps
