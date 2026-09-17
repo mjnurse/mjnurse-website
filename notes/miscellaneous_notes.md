@@ -37,7 +37,14 @@ The notes captured in the Linux notes tool = `n`.
 ### awk
 
 <table>
-<tr><td><code>cmd \\|\\| awk '{print $1, $3}'</code></td><td>print 1st and 3rd space separated columns</td></tr>
+<tr><td><code>awk 'BEGIN {OFS="-&gt;"}{ORS="\|"}{print $1, $2}' file</code></td><td>Output Field Separator, Output Record Separator (replacing newline)</td></tr>
+</table>
+
+### awk
+
+<table>
+<tr><td><code>awk '{print $1, $3, $NF, NF}' file</code></td><td>print 1st, 3rd, last field and number of fields ($0 is all fields)</td></tr>
+<tr><td><code>awk -F, '{print $1, $7}' file</code></td><td>use , as field separator (awk 'BEGIN {FS=","} {print ...) also works</td></tr>
 </table>
 
 ### bash
