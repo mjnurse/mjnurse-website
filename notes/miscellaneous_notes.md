@@ -37,14 +37,33 @@ The notes captured in the Linux notes tool = `n`.
 ### awk
 
 <table>
+<tr><td><code>awk '($1 ~ /re/ \|\| $1 ~/2/) && $2 == "one" && $3 &gt;= 7 {print $5}'</code></td><td>Various matches (!~ /x/ is not match)</td></tr>
+<tr><td><code>awk '/^#/ {next} {print}' file # skip lines starting</code></td><td>('NF == 0 {next} - skip blank lines)</td></tr>
+<tr><td><code>awk '/^aa/,/^bb/ {print $0}' file</code></td><td>output from first line starting 'aa' to the last line starting 'bb'</td></tr>
+<tr><td><code>awk '/error/' file</code></td><td>A regex match anywhere in file</td></tr>
+<tr><td><code>awk 'BEGIN { "date" \| getline nw; close("date"); print "time now: " tolower(nw)}'</code></td><td>run unix data and capture output</td></tr>
+<tr><td><code>awk 'BEGIN { i=1; while (("ls" \| getline f) &gt; 0) { print "file " i++ ": " f } close("ls") }'</code></td><td>loop though command output</td></tr>
+<tr><td><code>awk 'BEGIN {OFS="-&gt;"}{ORS="\|"}{print $1, $2}' file</code></td><td>Output Field Separator, O' Record S' (replacing newline)</td></tr>
 <tr><td><code>awk 'BEGIN {OFS="-&gt;"}{ORS="\|"}{print $1, $2}' file</code></td><td>Output Field Separator, Output Record Separator (replacing newline)</td></tr>
-</table>
-
-### awk
-
-<table>
+<tr><td><code>awk 'BEGIN {RS=""} {print $0}' file</code></td><td>Treat blank-line-separated paragraphs as records</td></tr>
+<tr><td><code>awk 'BEGIN {print "head"} {print $0} END {print "---\n" NR}' file</code></td><td>BEGIN/END</td></tr>
+<tr><td><code>awk 'NR == 1 {mn=mx=$1} $1&lt;mn {mn=$1} $1&gt;=mx {mx=$1} END {print mn, mx}' numfile</code></td><td>Can't use BEGIN as $1 not set for BEGIN.</td></tr>
+<tr><td>awk 'function sz(v) {if (v &lt; 5) return "S" else if (v &gt;= 9) return "L" else return "M"} {print $1, sz($1)}' file</td></tr>
+<tr><td><code>awk '{count[$1]++} END {for (x in count) print x, count[x]}' file</code></td><td>count is array indexed by $1 value containing count</td></tr>
+<tr><td><code>awk '{for (i=1; i&lt;=NF; i++) {print i, $i}}' file</code></td><td>for loop through all fields, every line</td></tr>
+<tr><td><code>awk '{i=1}{while (i&lt;=5) {print i; i++ }}' file</code></td><td>while loop, every line</td></tr>
+<tr><td><code>awk '{if ($1 &gt;= 80) {print $1, "Y"} else {print $1, "N"}}'</code></td><td>if, else. No elif - use 'else if'</td></tr>
+<tr><td><code>awk '{n=split($1,a,","); print n, a[1]}' file</code></td><td>split $1 on comma, n = number of elements, a is array of elements</td></tr>
 <tr><td><code>awk '{print $1, $3, $NF, NF}' file</code></td><td>print 1st, 3rd, last field and number of fields ($0 is all fields)</td></tr>
+<tr><td><code>awk '{print $1, $3, $NF, NF}' file</code></td><td>print 1st, 3rd, last field and number of fields ($0 is all fields)</td></tr>
+<tr><td><code>awk '{print FILENAME, NR, FNR, $0}' file1 file2</code></td><td>NR - record number continues, FNR - resets each file</td></tr>
+<tr><td><code>awk '{printf "%-12s %5d %.2f\n", $1, $2, $3}' file</code></td><td>Formatted output: %12s - left pad, %-12s - right pad</td></tr>
+<tr><td><code>awk '{t += ($1 + $2)} END {print "tot:" t, "avg:" t/NR}' file</code></td><td>Arithmetic</td></tr>
 <tr><td><code>awk -F, '{print $1, $7}' file</code></td><td>use , as field separator (awk 'BEGIN {FS=","} {print ...) also works</td></tr>
+<tr><td><code>awk -F, '{print $1, $7}' file</code></td><td>use , as field separator (awk 'BEGIN {FS=","} {print ...) also works</td></tr>
+<tr><td><code>awk -v x="$envvar" '$1 == x {print $0}' file</code></td><td>Using environment variables</td></tr>
+<tr><td><code>length($1), tolower($1), toupper($1), index($1, "err:")</code></td><td>index is find</td></tr>
+<tr><td><code>substr($1, 1, 3), sub(/foo.*bar/, "fb"), gsub(/foo/, "bar")</code></td><td>gsub - replace all occurrences</td></tr>
 </table>
 
 ### bash
@@ -83,6 +102,12 @@ The notes captured in the Linux notes tool = `n`.
 <table>
 <tr><td><code>column -J -s"," -N col1,col2</code></td><td>format csv as JSON with attribute names col1, col2</td></tr>
 <tr><td><code>column -t -s"," -N col1,col2</code></td><td>format csv as a table with headings col1, col2</td></tr>
+</table>
+
+### date
+
+<table>
+<tr><td><code>date -d "1 month ago" +%y-%m-%d</code></td><td>Outputs date 1 month ago in YY-MM-DD format.</td></tr>
 </table>
 
 ### find
