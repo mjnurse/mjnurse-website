@@ -48,7 +48,7 @@ The notes captured in the Linux notes tool = `n`.
 <tr><td><code>awk 'BEGIN {RS=""} {print $0}' file</code></td><td>Treat blank-line-separated paragraphs as records</td></tr>
 <tr><td><code>awk 'BEGIN {print "head"} {print $0} END {print "---\n" NR}' file</code></td><td>BEGIN/END</td></tr>
 <tr><td><code>awk 'NR == 1 {mn=mx=$1} $1&lt;mn {mn=$1} $1&gt;=mx {mx=$1} END {print mn, mx}' numfile</code></td><td>Can't use BEGIN as $1 not set for BEGIN.</td></tr>
-<tr><td>awk 'function sz(v) {if (v &lt; 5) return "S" else if (v &gt;= 9) return "L" else return "M"} {print $1, sz($1)}' file</td></tr>
+<tr><td><code>awk 'function sz(v) {if (v &lt; 5) return "S" else if (v &gt;= 9) return "L" else return "M"} {print $1, sz($1)}' file</code></td><td>functions</td></tr>
 <tr><td><code>awk '{count[$1]++} END {for (x in count) print x, count[x]}' file</code></td><td>count is array indexed by $1 value containing count</td></tr>
 <tr><td><code>awk '{for (i=1; i&lt;=NF; i++) {print i, $i}}' file</code></td><td>for loop through all fields, every line</td></tr>
 <tr><td><code>awk '{i=1}{while (i&lt;=5) {print i; i++ }}' file</code></td><td>while loop, every line</td></tr>
