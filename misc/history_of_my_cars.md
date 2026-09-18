@@ -10,7 +10,7 @@ This perhaps the oldest page on this website and its predecessors.  It is, as it
 
 ## Audi S5 Quattro
 
-<img style="margin: 1.5em 0em;" src="images/AudiS5-300x124.jpg">
+<img style="margin: 1.5em 0em;" src="images/AudiS5-300x214.jpg">
 
 **354bhp, 369lb-ft, 0-60mph: 4.7s, Top Speed: 155mph.**
 
@@ -24,7 +24,7 @@ I bought this at 2 years old but it was immaculate.  This is the best car I've h
 
 ## Austin Metro
 
-<img style="margin: 1.5em 0em;" src="images/Metro-300x124.jpg">
+<img style="margin: 1.5em 0em;" src="images/Metro-300x214.jpg">
 
 **41bhp, 53lb-ft. 0-60mph: 18.2s. Top Speed: 86mph.**
 
@@ -36,7 +36,7 @@ Once tried to drive through a flood. The water got so deep that I lost sight of 
 
 ## Ford Escort Encore 1.6
 
-<img style="margin: 1.5em 0em;" src="images/Escort-300x124.jpg">
+<img style="margin: 1.5em 0em;" src="images/Escort-300x214.jpg">
 
 **89bhp. 96lb-ft. 0-60mph: 11.5s. Top Speed: 110mph.**
 
