@@ -48,7 +48,7 @@ The notes captured in the Linux notes tool = `n`.
 <tr><td><code>awk 'BEGIN {RS=""} {print $0}' file</code></td><td>Treat blank-line-separated paragraphs as records</td></tr>
 <tr><td><code>awk 'BEGIN {print "head"} {print $0} END {print "---\n" NR}' file</code></td><td>BEGIN/END</td></tr>
 <tr><td><code>awk 'NR == 1 {mn=mx=$1} $1&lt;mn {mn=$1} $1&gt;=mx {mx=$1} END {print mn, mx}' numfile</code></td><td>Can't use BEGIN as $1 not set for BEGIN.</td></tr>
-<tr><td>awk 'function sz(v) {if (v &lt; 5) return "S" else if (v &gt;= 9) return "L" else return "M"} {print $1, sz($1)}' file</td></tr>
+<tr><td><code>awk 'function sz(v) {if (v &lt; 5) return "S" else if (v &gt;= 9) return "L" else return "M"} {print $1, sz($1)}' file</code></td><td>functions</td></tr>
 <tr><td><code>awk '{count[$1]++} END {for (x in count) print x, count[x]}' file</code></td><td>count is array indexed by $1 value containing count</td></tr>
 <tr><td><code>awk '{for (i=1; i&lt;=NF; i++) {print i, $i}}' file</code></td><td>for loop through all fields, every line</td></tr>
 <tr><td><code>awk '{i=1}{while (i&lt;=5) {print i; i++ }}' file</code></td><td>while loop, every line</td></tr>
@@ -74,6 +74,7 @@ The notes captured in the Linux notes tool = `n`.
 <tr><td><code>#!/usr/bin/env bash</code></td><td>First line bash script</td></tr>
 <tr><td><code>${var^^} ${var,,}</code></td><td>var to UPPERCASE, lowercase</td></tr>
 <tr><td><code>COLUMNS=1; PS3="Choose: "; select v in *; do [[ -n $v ]] && break; done</code></td><td>Generate a numbered list of options</td></tr>
+<tr><td><code>CTRL-X CTRL-E</code></td><td>Edit current command line</td></tr>
 <tr><td><code>cp file.txt{,.bak}</code></td><td>cp file.txt file.txt.bak</td></tr>
 <tr><td><code>echo {0..10..2}</code></td><td>0 -&gt; 10 in steps of 2: 0 2 4 6 8 10</td></tr>
 <tr><td><code>echo {1,2}{a..e}</code></td><td>1a 1b 1c 1d 1e 2a 2b 2c 2d 2e</td></tr>

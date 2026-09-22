@@ -84,7 +84,7 @@ The Colour was a little embarrassing for an 18yr old.
 
 Great fun but didn't like an up hill run.
 
-### 3. Volkswagen Golf Mk2 1.3c
+### 3. Volkswagen Golf Mk2 1.3
 
 <img style="margin: 1.5em 0em;" src="images/GolfMk2White-300x214.jpg">
 
