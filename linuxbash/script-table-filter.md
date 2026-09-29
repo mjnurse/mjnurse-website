@@ -110,16 +110,18 @@ def format_value(value: float, format_type: str) -> str:
             return f"{value:.2f}"
 
 
-def parse_table(lines: List[str]) -> tuple[List[str], List[Dict[str, str]]]:
-    """Parse table from stdin, return headers and rows."""
+def parse_table(lines: List[str]) -> tuple[List[str], List[Dict[str, str]], List[int]]:
+    """Parse table from stdin, return headers, rows, and line numbers with mismatched column counts."""
     if not lines:
-        return [], []
+        return [], [], []
 
     header_line = lines[0]
     headers = header_line.split()
+    expected_cols = len(headers)
 
     rows = []
-    for line in lines[1:]:
+    mismatched_lines = []
+    for line_idx, line in enumerate(lines[1:], start=2):  # Start at 2 since line 1 is header
         if not line.strip():
             continue
         parts = line.split()
@@ -129,7 +131,11 @@ def parse_table(lines: List[str]) -> tuple[List[str], List[Dict[str, str]]]:
             row[headers[i]] = parts[i] if i < len(parts) else ''
         rows.append(row)
 
-    return headers, rows
+        # Track lines with column count mismatch
+        if len(parts) != expected_cols:
+            mismatched_lines.append(line_idx)
+
+    return headers, rows, mismatched_lines
 
 
 def apply_filters(rows: List[Dict[str, str]], filters: List[str]) -> List[Dict[str, str]]:
@@ -490,11 +496,20 @@ Filters support: =, !=, <>, >, >=, <, <= (wildcards * allowed with = and !=)'''
             sys.exit(1)
 
     lines = [line.rstrip('\n') for line in sys.stdin]
-    headers, rows = parse_table(lines)
+    headers, rows, mismatched_lines = parse_table(lines)
 
     if not rows:
         print("No data to process", file=sys.stderr)
         sys.exit(1)
+
+    # Warn if any lines have mismatched column counts
+    if mismatched_lines:
+        if len(mismatched_lines) <= 5:
+            lines_str = ', '.join(str(ln) for ln in mismatched_lines)
+            print(f"Warning: Line(s) {lines_str} do not have {len(headers)} columns (expected based on header).", file=sys.stderr)
+        else:
+            lines_str = ', '.join(str(ln) for ln in mismatched_lines[:5])
+            print(f"Warning: {len(mismatched_lines)} lines do not have {len(headers)} columns (first few: {lines_str}).", file=sys.stderr)
 
     # Collect filters from unknown arguments (anything with comparison operators)
     filters = [arg for arg in unknown if any(op in arg for op in ['!=', '<>', '>=', '<=', '=', '>', '<'])]
@@ -510,6 +525,8 @@ Filters support: =, !=, <>, >, >=, <, <= (wildcards * allowed with = and !=)'''
 
         if col and col not in headers:
             print(f"Error: Filter column '{col}' does not exist. Available columns: {', '.join(headers)}", file=sys.stderr)
+            if len(headers) == 1:
+                print(f"Warning: Only one column detected: '{headers[0]}'. Expected space-separated columns.", file=sys.stderr)
             sys.exit(1)
 
     # Apply filters
@@ -522,6 +539,8 @@ Filters support: =, !=, <>, >, >=, <, <= (wildcards * allowed with = and !=)'''
     for col in group_cols:
         if col and col not in headers:
             print(f"Error: Group column '{col}' does not exist. Available columns: {', '.join(headers)}", file=sys.stderr)
+            if len(headers) == 1:
+                print(f"Warning: Only one column detected: '{headers[0]}'. Expected space-separated columns.", file=sys.stderr)
             sys.exit(1)
 
     agg_specs = {}
@@ -541,6 +560,8 @@ Filters support: =, !=, <>, >, >=, <, <= (wildcards * allowed with = and !=)'''
         for col in cols:
             if col and col not in headers:
                 print(f"Error: Aggregation column '{col}' (--{agg_type}) does not exist. Available columns: {', '.join(headers)}", file=sys.stderr)
+                if len(headers) == 1:
+                    print(f"Warning: Only one column detected: '{headers[0]}'. Expected space-separated columns.", file=sys.stderr)
                 sys.exit(1)
 
     # Group and aggregate
@@ -571,6 +592,8 @@ Filters support: =, !=, <>, >, >=, <, <= (wildcards * allowed with = and !=)'''
             # Validate order column
             if actual_col not in all_possible_cols:
                 print(f"Error: Order column '{actual_col}' does not exist. Available columns: {', '.join(sorted(all_possible_cols))}", file=sys.stderr)
+                if len(headers) == 1:
+                    print(f"Warning: Only one column detected: '{headers[0]}'. Expected space-separated columns.", file=sys.stderr)
                 sys.exit(1)
 
             order_keys.append((actual_col, reverse))
@@ -611,6 +634,8 @@ Filters support: =, !=, <>, >, >=, <, <= (wildcards * allowed with = and !=)'''
     for col in show_cols:
         if col and col not in all_possible_cols:
             print(f"Error: Show column '{col}' does not exist. Available columns: {', '.join(sorted(all_possible_cols))}", file=sys.stderr)
+            if len(headers) == 1:
+                print(f"Warning: Only one column detected: '{headers[0]}'. Expected space-separated columns.", file=sys.stderr)
             sys.exit(1)
 
     # Filter to only show requested columns
@@ -691,6 +716,10 @@ DROP TABLE IF EXISTS t;
         print_json(output_headers, result, args.totals)
     else:
         print_table(output_headers, result, args.totals)
+
+    # Warn if only one column was detected
+    if len(headers) == 1:
+        print(f"\nWarning: Only one column detected: '{headers[0]}'. Expected space-separated columns.", file=sys.stderr)
 
 
 if __name__ == '__main__':
