@@ -1,19 +1,22 @@
 ---
-title: table-filter - Python tool for filtering, grouping, and aggregating tabular data from stdinh
+title: table-filter - Python tool for filtering, grouping, and aggregating tabular data from stdin
 ---
 
 ```bash
 #!/usr/bin/env python3
 DESCRIPTION="""
-Python tool processing whitespace-separated tabular data from stdin, allowing:
+Python tool processing tabular data from stdin (whitespace or custom separator), allowing:
 - Filter rows based on column values with various operators.
 - Group rows by one or more columns.
 - Aggregate data using functions like sum, average, min, max, and count.
+- Custom column separators (e.g., comma, tab, pipe).
+- Quoted fields (separators inside quotes are preserved).
 """
 AUTHOR="mjnurse.github.io - 2026"
 
 HELP_LINE="Python tool for filtering, grouping, and aggregating tabular data from stdin"
-WEB_DESC_LINE="Python tool for filtering, grouping, and aggregating tabular data from stdinh"
+WEB_DESC_LINE="Python tool for filtering, grouping, and aggregating tabular data from stdin"
+
 import sys
 import argparse
 import re
@@ -110,13 +113,71 @@ def format_value(value: float, format_type: str) -> str:
             return f"{value:.2f}"
 
 
-def parse_table(lines: List[str]) -> tuple[List[str], List[Dict[str, str]], List[int]]:
-    """Parse table from stdin, return headers, rows, and line numbers with mismatched column counts."""
+def split_with_quotes(line: str, separator: str = None) -> List[str]:
+    """Split a line by separator, respecting quoted fields.
+
+    Args:
+        line: Line to split
+        separator: Separator to use (None for whitespace)
+
+    Returns:
+        List of fields with quotes removed and values stripped
+    """
+    if separator is None:
+        # For whitespace separation, use shlex-like parsing
+        import shlex
+        try:
+            return shlex.split(line)
+        except ValueError:
+            # If shlex fails (unmatched quotes), fall back to simple split
+            return line.split()
+
+    # For specific separator, manually parse respecting quotes
+    parts = []
+    current = []
+    in_quotes = False
+    quote_char = None
+    i = 0
+
+    while i < len(line):
+        char = line[i]
+
+        if not in_quotes:
+            if char in ('"', "'"):
+                in_quotes = True
+                quote_char = char
+            elif char == separator:
+                parts.append(''.join(current).strip())
+                current = []
+            else:
+                current.append(char)
+        else:
+            if char == quote_char:
+                in_quotes = False
+                quote_char = None
+            else:
+                current.append(char)
+
+        i += 1
+
+    # Add the last field
+    parts.append(''.join(current).strip())
+
+    return parts
+
+
+def parse_table(lines: List[str], separator: str = None) -> tuple[List[str], List[Dict[str, str]], List[int]]:
+    """Parse table from stdin, return headers, rows, and line numbers with mismatched column counts.
+
+    Args:
+        lines: Input lines to parse
+        separator: Column separator (None for whitespace, or a specific character like ',')
+    """
     if not lines:
         return [], [], []
 
     header_line = lines[0]
-    headers = header_line.split()
+    headers = split_with_quotes(header_line, separator)
     expected_cols = len(headers)
 
     rows = []
@@ -124,7 +185,7 @@ def parse_table(lines: List[str]) -> tuple[List[str], List[Dict[str, str]], List
     for line_idx, line in enumerate(lines[1:], start=2):  # Start at 2 since line 1 is header
         if not line.strip():
             continue
-        parts = line.split()
+        parts = split_with_quotes(line, separator)
         # Include all rows, even with missing values
         row = {}
         for i in range(len(headers)):
@@ -470,8 +531,10 @@ def main():
         epilog='''Examples:
   command | %(prog)s col1=bbbb col3=y --group col1 --sum col4 --show col1,sum_col4
   command | %(prog)s col1!=foo "size>1GB" count>=10 --order -size
+  command | %(prog)s --sep ',' col1=value --group col2
 Filters support: =, !=, <>, >, >=, <, <= (wildcards * allowed with = and !=)'''
     )
+    parser.add_argument('--sep', '--separator', dest='separator', metavar='SEP', help='Column separator (default: whitespace). Use --sep "\\t" for tab-separated, "," for comma-separated')
     parser.add_argument('--group', help='Comma-separated columns to group by')
     parser.add_argument('--sum', help='Comma-separated columns to sum')
     parser.add_argument('--count', help='Comma-separated columns to count')
@@ -496,7 +559,7 @@ Filters support: =, !=, <>, >, >=, <, <= (wildcards * allowed with = and !=)'''
             sys.exit(1)
 
     lines = [line.rstrip('\n') for line in sys.stdin]
-    headers, rows, mismatched_lines = parse_table(lines)
+    headers, rows, mismatched_lines = parse_table(lines, separator=args.separator)
 
     if not rows:
         print("No data to process", file=sys.stderr)
@@ -723,6 +786,14 @@ DROP TABLE IF EXISTS t;
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except BrokenPipeError:
+        # Gracefully handle broken pipe (e.g., when output is piped to head)
+        # Close stdout to avoid additional broken pipe errors
+        import os
+        devnull = os.open(os.devnull, os.O_WRONLY)
+        os.dup2(devnull, sys.stdout.fileno())
+        sys.exit(0)
 
 ```
