@@ -1,5 +1,5 @@
 ---
-title: uc - Search and find Unicode characters and icons
+title: uc - Search and find Unicode characters and icons (not but similar to extended ASCII)
 ---
 
 ```bash
@@ -26,8 +26,8 @@ DESCRIPTION
 AUTHOR
     mjnurse.github.io - 2026
 "
-help_line="Search and find Unicode characters and icons"
-web_desc_line="Search and find Unicode characters and icons"
+help_line="Search and find Unicode characters and icons (not but similar to extended ASCII)"
+web_desc_line="Search and find Unicode characters and icons (not but similar to extended ASCII)"
 
 tmpfile="/tmp/uc.tmp"
 rm -f $tmpfile
@@ -98,7 +98,7 @@ while read -r line; do
 done
 
 echo
-printf "${clcya}Select a character by number of view enlarged/copy (blank to exit): ${cdef}"
+printf "${clcya}Select a character by number to view enlarged/copy to clipboard (blank to exit): ${cdef}"
 read n
 if [[ -z "$n" ]]; then
     exit

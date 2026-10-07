@@ -291,6 +291,21 @@ FROM   tab
 WHERE  col = 'bloggs';
 ```
 
+# Table Value Constructor - VALUES
+
+```sql
+WITH t(a, b) AS 
+    (VALUES ('p', 2), ('q', 1)) 
+SELECT  * 
+FROM    t;
+
+a  b
+-  -
+p  2
+q  1
+
+```
+
 # Load CSV Data
 
 ```sql
