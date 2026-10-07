@@ -40,12 +40,6 @@ try="Try ${0##*/} -h for more information"
 tmp="${help_text##*USAGE}"
 usage=$(echo "Usage: ${tmp%%OPTIONS*}" | tr -d "\n" | sed "s/  */ /g")
 
-if [[ "$1" == "" ]]; then
-    echo "${usage}"
-    echo "${try}"
-    exit 1
-fi
-
 exact=false
 while [[ "$1" != "" ]]; do
     case $1 in
@@ -103,7 +97,7 @@ if [[ -z "$n" ]]; then
 fi
 echo
 char=$(sed -n "$((n))p" $tmpfile)
-printf "$char" | iconv -f UTF-8 -t UTF-16LE | clip.exe
+printf "$char" | powershell.exe -NoProfile -Command '[Console]::InputEncoding=[Text.Encoding]::UTF8; Set-Clipboard -Value ([Console]::In.ReadToEnd())'
 
 echo "(copied to clipboard)"
 
@@ -140,7 +134,7 @@ echo "(copied to clipboard)"
 # \U0001f4aa:flexed biceps 
 # 
 ## symbols
-# \U2764:| red heart 
+# \U2764:red heart 
 # \U0001f9e1:orange heart 
 # \U0001f49b:yellow heart 
 # \U0001f49a:green heart 
@@ -159,7 +153,7 @@ echo "(copied to clipboard)"
 # \U0001f4a1:light bulb 
 # 
 ## nature
-# \U0001f436:| dog face 
+# \U0001f436:dog face 
 # \U0001f431:cat face 
 # \U0001f42d:mouse face 
 # \U0001f43b:bear 
@@ -182,7 +176,7 @@ echo "(copied to clipboard)"
 # \U0001f30a:water wave 
 # 
 ## drink
-# \U0001f34e:| red apple 
+# \U0001f34e:red apple 
 # \U0001f355:pizza 
 # \U0001f354:hamburger 
 # \U0001f37a:beer mug 
@@ -192,7 +186,7 @@ echo "(copied to clipboard)"
 # \U0001f37f:popcorn 
 # 
 ## transport
-# \U0001f680:| rocket 
+# \U0001f680:rocket 
 # \U2708:airplane 
 # \U0001f697:car 
 # \U0001f682:locomotive 
@@ -206,7 +200,7 @@ echo "(copied to clipboard)"
 # \U0001f5fa:world map 
 # 
 ## tech favourites
-# \U0001f4bb:| laptop 
+# \U0001f4bb:laptop 
 # \U0001f5a5:desktop computer 
 # \U2328:keyboard 
 # \U0001f5b1:computer mouse 
@@ -239,7 +233,7 @@ echo "(copied to clipboard)"
 # \U0001f4c9:chart decreasing 
 # 
 ## indicators
-# \U2705:| check mark 
+# \U2705:check mark 
 # \U274c:cross mark 
 # \U26a0:warning 
 # \U0001f6ab:prohibited 
@@ -271,7 +265,7 @@ echo "(copied to clipboard)"
 # \U0001f3af:bullseye 
 # 
 ## calendar
-# \U23f0:| alarm clock 
+# \U23f0:alarm clock 
 # \U23f1:stopwatch 
 # \U23f3:hourglass 
 # \U0001f4c5:calendar 
@@ -283,7 +277,7 @@ echo "(copied to clipboard)"
 # \U0001f555:six oclock 
 # 
 ## directions
-# \U2b06:| up arrow 
+# \U2b06:up arrow 
 # \U2b07:down arrow 
 # \U2b05:left arrow 
 # \U27a1:right arrow 
@@ -295,7 +289,7 @@ echo "(copied to clipboard)"
 # \U21aa:left arrow curving right 
 # 
 ## objects
-# \U0001f389:| party popper 
+# \U0001f389:party popper 
 # \U0001f38a:confetti ball 
 # \U0001f388:balloon 
 # \U0001f3c6:trophy 

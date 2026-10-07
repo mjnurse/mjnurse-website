@@ -254,6 +254,7 @@ button {
   color: var(--clr-primary);
   padding: 0 0 0.3em 0;
   position: relative;
+  text-decoration: none;
 }
 .link:hover {
   color: var(--clr-primary);
@@ -279,6 +280,7 @@ button {
   color: var(--clr-fg);
   text-transform: lowercase;
   font-weight: 500;
+  text-decoration: none;
 }
 
 .link--icon {
