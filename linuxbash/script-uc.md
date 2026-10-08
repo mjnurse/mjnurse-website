@@ -2,6 +2,54 @@
 title: uc - Search and find Unicode characters and icons (not but similar to extended ASCII)
 ---
 
+## Demo
+
+<pre style='background: black; color: white;'>
+$ uc arrow up right
+
+<span style="filter: contrast(70%) brightness(190%);color:teal;">Arrows </span>
+1) ↗ : <span style="filter: contrast(70%) brightness(190%);color:purple;">up</span> <span style="filter: contrast(70%) brightness(190%);color:purple;">right</span> <span style="filter: contrast(70%) brightness(190%);color:purple;">arrow</span>
+2) ↱ : <span style="filter: contrast(70%) brightness(190%);color:purple;">up</span> <span style="filter: contrast(70%) brightness(190%);color:purple;">arrow</span> corner <span style="filter: contrast(70%) brightness(190%);color:purple;">right</span>
+
+<span style="filter: contrast(70%) brightness(190%);color:teal;">Dingbats </span>
+3) ➦ : heavy black curved <span style="filter: contrast(70%) brightness(190%);color:purple;">up</span> <span style="filter: contrast(70%) brightness(190%);color:purple;">right</span> <span style="filter: contrast(70%) brightness(190%);color:purple;">arrow</span>
+4) ➮ : heavy <span style="filter: contrast(70%) brightness(190%);color:purple;">up</span>per right shadowed white <span style="filter: contrast(70%) brightness(190%);color:purple;">right</span> <span style="filter: contrast(70%) brightness(190%);color:purple;">arrow</span>
+5) ➱ : notched <span style="filter: contrast(70%) brightness(190%);color:purple;">up</span>per right shadowed white <span style="filter: contrast(70%) brightness(190%);color:purple;">right</span> <span style="filter: contrast(70%) brightness(190%);color:purple;">arrow</span>
+
+<span style="filter: contrast(70%) brightness(190%);color:teal;">Select a character by number to view enlarged/copy to clipboard (blank to exit): </span>2
+
+                                                  
+                                                  
+                                                  
+                                                  
+                            ▄▄                    
+                           ▀███▄                  
+                             ▀███▄                
+                  ▄▄▄▄▄▄▄▄▄▄▄▄▄████▄              
+                  ███████████████████             
+                  ████        ▄████▀              
+                  ████      ▄████▀                
+                  ████     ████▀                  
+                  ████      ▀▀                    
+                  ████                            
+                  ████                            
+                  ████                            
+                  ████                            
+                  ████                            
+                  ████                            
+                                                  
+                                                  
+                                                  
+                                                  
+                                                  
+
+(copied to clipboard)
+$ 
+</pre>
+
+
+## Script
+
 ```bash
 #!/usr/bin/env bash
 help_text="
@@ -9,7 +57,7 @@ NAME
     unicode - Search and find Unicode characters and icons.
 
 USAGE
-    unicode [options] <search-terms>
+    unicode [options] <search-terms (. matches all)>
 
 OPTIONS
     -e|--exact
@@ -72,6 +120,12 @@ p1="${sp}${1}${sp}"
 p2="${sp}${2:-$1}${sp}"
 p3="${sp}${3:-$1}${sp}"
 
+if [[ "$p1" == "." ]]; then
+    p1m=""; p2m=""; p3m=""
+else
+    p1m="$p1"; p2m="$p2"; p3m="$p3"
+fi
+
 n=1
 cat $0 | sed 's/$/ /; s/:/ : /' | \
     egrep "^## |^# [^:]*:.*${p1}" | \
@@ -82,9 +136,9 @@ cat $0 | sed 's/$/ /; s/:/ : /' | \
     sed -E "
         s/^# //; 
         s/^## (.*)$/#${clcya}\1${cdef}/; 
-        s/(.*:.*)(${p1})/\1${clmag}\2${cdef}/g;
-        s/(.*:.*)(${p2})/\1${clmag}\2${cdef}/g;
-        s/(.*:.*)(${p3})/\1${clmag}\2${cdef}/g;
+        s/(.*:.*)(${p1m})(.*)/\1${clmag}\2${cdef}\3/g;
+        s/(.*:.*)(${p2m})(.*)/\1${clmag}\2${cdef}\3/g;
+        s/(.*:.*)(${p3m})(.*)/\1${clmag}\2${cdef}\3/g;
     " | \
 while read -r line; do
     if [[ "${line:0:1}" == "#" ]]; then
@@ -125,7 +179,7 @@ for y in range(0, int(size/2)-2, 2):  # Process two rows at a time
         if top and bottom: print("█", end="")
         elif top: print("▀", end="")
         elif bottom: print("▄", end="")
-        else: print("⋅", end="")
+        else: print(" ", end="")
     print()
 ' | python3
 
