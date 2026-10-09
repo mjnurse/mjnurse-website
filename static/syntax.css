@@ -2,12 +2,14 @@
 pre { 
   line-height: 125%; 
   font-family: 'Monaco', 'Menlo', 'Consolas', 'Courier New', monospace;
+  font-size: small;
   padding: 1.2em;
   border-radius: 8px;
   overflow-x: auto;
 }
 code {
   font-family: 'Monaco', 'Menlo', 'Consolas', 'Courier New', monospace;
+  font-size: small;
 }
 
 /* Inline code styling (not inside code blocks) */
