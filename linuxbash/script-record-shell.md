@@ -42,7 +42,7 @@ sed -i '${/^exit$/d;}' /tmp/record.log
 
 # Convert the log to HTML and style the <pre> block
 aha < /tmp/record.log | sed -n "/<pre>/,/<\/pre>/p" | sed "
-    s/^<pre>$/<pre style='background: black; color: white; margin-top: 20px'>/
+    s/^<pre>$/<pre style='background: black; color: white; margin-top: 20px;'>/
     s/filter: contrast[^;]*; *//g
 " > $1.html
 rm -f /tmp/record.log
