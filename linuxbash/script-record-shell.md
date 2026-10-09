@@ -1,5 +1,5 @@
 ---
-title: record-shell - Record Shell Session - saving as HTML
+title: record-shell - Record shell session - saving as HTML
 ---
 
 ```bash
@@ -9,8 +9,8 @@ usage: record [options] <filename>
 -h : This help text.
 "
 
-help_line="Record Shell Session - saving as HTML"
-web_desc_line="Record Shell Session - saving as HTML"
+help_line="Record shell session - saving as HTML"
+web_desc_line="Record shell session - saving as HTML"
 
 case $1 in
     -h|--help)
@@ -24,20 +24,28 @@ if [[ "$1" == "" ]]; then
     exit 1
 fi
 
+# Record the shell session to a temporary log file
 script --log-out=/tmp/record.log -c 'PS1="$ "; export PS1; exec bash --norc -i'
 
+# Remove script start and end lines, and carriage return characters
 sed -i '
     /^Script started/d
     /^Script done/d
     s/\r//g
 ' /tmp/record.log
 
+# Remove empty lines at the beginning and end of the log
 sed -i -e '/./,$!d' -e ':a' -e '/./!{$d;N;ba}' /tmp/record.log
 
+# Remove exit command at the end of the log
 sed -i '${/^exit$/d;}' /tmp/record.log
 
-aha < /tmp/record.log | sed -n "/<pre>/,/<\/pre>/p" | sed "s/^<pre>$/<pre style='background: black; color: white;'>/" > $1.html
-# rm -f /tmp/record.log
+# Convert the log to HTML and style the <pre> block
+aha < /tmp/record.log | sed -n "/<pre>/,/<\/pre>/p" | sed "
+    s/^<pre>$/<pre style='background: black; color: white;'>/
+    s/filter: contrast[^;]*; *//g
+" > $1.html
+rm -f /tmp/record.log
 
 echo "File created: $1.html"
 ```

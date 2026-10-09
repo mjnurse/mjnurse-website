@@ -7,16 +7,16 @@ title: uc - Search and find Unicode characters and icons (not but similar to ext
 <pre style='background: black; color: white;'>
 $ uc arrow up right
 
-<span style="filter: contrast(70%) brightness(190%);color:teal;">Arrows </span>
-1) ↗ : <span style="filter: contrast(70%) brightness(190%);color:purple;">up</span> <span style="filter: contrast(70%) brightness(190%);color:purple;">right</span> <span style="filter: contrast(70%) brightness(190%);color:purple;">arrow</span>
-2) ↱ : <span style="filter: contrast(70%) brightness(190%);color:purple;">up</span> <span style="filter: contrast(70%) brightness(190%);color:purple;">arrow</span> corner <span style="filter: contrast(70%) brightness(190%);color:purple;">right</span>
+<span style="color:teal;">Arrows </span>
+1) ↗ : <span style="color:purple;">up</span> <span style="color:purple;">right</span> <span style="color:purple;">arrow</span>
+2) ↱ : <span style="color:purple;">up</span> <span style="color:purple;">arrow</span> corner <span style="color:purple;">right</span>
 
-<span style="filter: contrast(70%) brightness(190%);color:teal;">Dingbats </span>
-3) ➦ : heavy black curved <span style="filter: contrast(70%) brightness(190%);color:purple;">up</span> <span style="filter: contrast(70%) brightness(190%);color:purple;">right</span> <span style="filter: contrast(70%) brightness(190%);color:purple;">arrow</span>
-4) ➮ : heavy <span style="filter: contrast(70%) brightness(190%);color:purple;">up</span>per right shadowed white <span style="filter: contrast(70%) brightness(190%);color:purple;">right</span> <span style="filter: contrast(70%) brightness(190%);color:purple;">arrow</span>
-5) ➱ : notched <span style="filter: contrast(70%) brightness(190%);color:purple;">up</span>per right shadowed white <span style="filter: contrast(70%) brightness(190%);color:purple;">right</span> <span style="filter: contrast(70%) brightness(190%);color:purple;">arrow</span>
+<span style="color:teal;">Dingbats </span>
+3) ➦ : heavy black curved <span style="color:purple;">up</span> <span style="color:purple;">right</span> <span style="color:purple;">arrow</span>
+4) ➮ : heavy <span style="color:purple;">up</span>per right shadowed white <span style="color:purple;">right</span> <span style="color:purple;">arrow</span>
+5) ➱ : notched <span style="color:purple;">up</span>per right shadowed white <span style="color:purple;">right</span> <span style="color:purple;">arrow</span>
 
-<span style="filter: contrast(70%) brightness(190%);color:teal;">Select a character by number to view enlarged/copy to clipboard (blank to exit): </span>2
+<span style="color:teal;">Select a character by number to view enlarged/copy to clipboard (blank to exit): </span>2
 
                                                   
                                                   
