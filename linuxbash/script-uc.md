@@ -3,7 +3,7 @@ title: uc - Search and find Unicode characters and icons (not but similar to ext
 ---
 
 ## Demo
-<br>
+
 <pre style='background: black; color: white;'>
 $ uc arrow up right
 
