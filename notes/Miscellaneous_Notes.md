@@ -199,6 +199,7 @@ The notes captured in the Linux notes tool = `n`.
 ### sed
 
 <table>
+<tr><td><code>s/de/la&da/</code></td><td>& in replacement is the matched text</td></tr>
 <tr><td><code>sed -E</code></td><td>Extended - can use 's/a+/b/' rather than 's/a\+/b/'</td></tr>
 <tr><td><code>sed -E 's/a+/b/'</code></td><td>one or more a's.</td></tr>
 <tr><td><code>sed -E 's/a{2,5}/b/'</code></td><td>between 2 and 5 a's</td></tr>
@@ -239,6 +240,7 @@ The notes captured in the Linux notes tool = `n`.
 <tr><td><code>\d \x (\D \X)</code></td><td>digit [0-9], hex digit [0-9A-Fa-f]. Uppercase: non... [sed, regex]</td></tr>
 <tr><td><code>\l \u</code></td><td>lowercase letter [a-z], uppercase letter [sed, regex]</td></tr>
 <tr><td><code>\w \s (\W \S)</code></td><td>word character [0-9A-Za-z_], whitespace char (space, tab). Uppercase: non... [sed, regex]</td></tr>
+<tr><td><code>s/de/la&da/</code></td><td>& in replacement is the matched text</td></tr>
 </table>
 
 ### wsl
