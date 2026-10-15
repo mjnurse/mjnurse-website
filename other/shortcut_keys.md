@@ -706,5 +706,6 @@
 | Key | Description |
 |-----|-------------|
 | `CTRL-SHIFT-ESCAPE` | Task Manager |
+| `WIN-.` | Select Emoji, symbol, etc. |
 | `WIN-H` | Dictate |
 | `WIN-X` | Quick Link Menu |
