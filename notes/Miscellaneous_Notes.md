@@ -41,7 +41,7 @@ The notes captured in the Linux notes tool = `n`.
 <tr><td><code>awk '/^#/ {next} {print}' file # skip lines starting</code></td><td>('NF == 0 {next} - skip blank lines)</td></tr>
 <tr><td><code>awk '/^aa/,/^bb/ {print $0}' file</code></td><td>output from first line starting 'aa' to the last line starting 'bb'</td></tr>
 <tr><td><code>awk '/error/' file</code></td><td>A regex match anywhere in file</td></tr>
-<tr><td><code>awk 'BEGIN { "date" \| getline nw; close("date"); print "time now: " tolower(nw)}'</code></td><td>run unix data and capture output</td></tr>
+<tr><td><code>awk 'BEGIN { "date" \| getline nw; close("date"); print "time now: " tolower(nw)}'</code></td><td>run unix date and capture output</td></tr>
 <tr><td><code>awk 'BEGIN { i=1; while (("ls" \| getline f) &gt; 0) { print "file " i++ ": " f } close("ls") }'</code></td><td>loop though command output</td></tr>
 <tr><td><code>awk 'BEGIN {OFS="-&gt;"}{ORS="\|"}{print $1, $2}' file</code></td><td>Output Field Separator, O' Record S' (replacing newline)</td></tr>
 <tr><td><code>awk 'BEGIN {OFS="-&gt;"}{ORS="\|"}{print $1, $2}' file</code></td><td>Output Field Separator, Output Record Separator (replacing newline)</td></tr>

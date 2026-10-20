@@ -34,7 +34,7 @@ AUTHOR
 help_line="Query shortcut keys.  Options to add, edit, delete."
 web_desc_line="Query shortcut keys - Options to add edit delete"
 
-sck_csv="/home/martin/mjnurse/shortcut-keys/sck.csv"
+sck_csv="/home/martin/mjnurse/bash/sck.csv"
 tmp_file="/tmp/sck.tmp"
 
 try="Try \"${0##*/} -h\" for more information"
@@ -150,7 +150,7 @@ else
     fi
     echo
     grep -i "$w1" "$sck_csv" | grep -i "$w2" | grep -i "$w3" | grep -i "$w4" | grep -i "$w5" | sort | \
-        sed "s/\",\"/ - /g; s/^\"//; s/\"$//; s/ -  - / - /" | grep -i --color=auto "$words"
+        sed 's/","/¬/g; s/^"//; s/"$//' | column -s¬ -t | grep -i --color "$words" 
     echo
 fi
 
