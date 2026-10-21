@@ -700,3 +700,10 @@
 | `WIN-.` | Select Emoji, symbol, etc. |
 | `WIN-H` | Dictate |
 | `WIN-X` | Quick Link Menu |
+
+### Print Screen
+
+| Key | Description |
+|-----|-------------|
+| `ALT-PRINTSCREEN` | Capture current window |
+| `SHIFT-PRINTSCREEN` | Capture all screens |

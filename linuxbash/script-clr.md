@@ -44,7 +44,7 @@ clblu="\e[94m"; clmag="\e[95m"; clcya="\e[96m"
 
 function cecho {
     color=c$1; shift
-    echo -e "${!color}$*${cdef}"
+    echo -e $"${!color}$*${cdef}"
 }
 
 try="Try ${0##*/} -h for more information"
@@ -73,16 +73,16 @@ cecho lgre "Checking local git repositories for uncommitted changes..."
 
 if [[ "$push_yn" == "n" ]]; then 
     changes_yn=n
-    for d in /home/martin/mjnurse/bash \
-             /home/martin/mjnurse/python \
-             /home/martin/mjnurse/cli-builder \
-             /home/martin/mjnurse/website-builder \
-             /home/martin/mjnurse/mjnurse-website \
-             /home/martin/mjnurse/mjnurse.github.io \
+    for d in ~/mjnurse/bash \
+             ~/mjnurse/python \
+             ~/mjnurse/cli-builder \
+             ~/mjnurse/website-builder \
+             ~/mjnurse/mjnurse-website \
+             ~/mjnurse/mjnurse.github.io \
             ; do
         cd $d
         if [[ "$(git status --short)" != "" ]]; then
-            echo -e "${ccya}- Uncommitted changes in repo: ${clcya}$d${cdef}"
+            echo $"${ccya}- Uncommitted changes in repo: ${clcya}$d${cdef}"
             changes_yn=y
         fi
     done
@@ -93,13 +93,12 @@ if [[ "$push_yn" == "n" ]]; then
     exit 1
 fi
 
-for d in /home/martin/mjnurse/bash \
-         /home/martin/mjnurse/shortcut-keys \
-         /home/martin/mjnurse/python \
-         /home/martin/mjnurse/cli-builder \
-         /home/martin/mjnurse/website-builder \
-         /home/martin/mjnurse/mjnurse-website \
-         /home/martin/mjnurse/mjnurse.github.io \
+for d in ~/mjnurse/bash \
+         ~/mjnurse/python \
+         ~/mjnurse/cli-builder \
+         ~/mjnurse/website-builder \
+         ~/mjnurse/mjnurse-website \
+         ~/mjnurse/mjnurse.github.io \
         ; do
     cd $d
     if [[ "$(git status --short)" != "" ]]; then
