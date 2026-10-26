@@ -80,10 +80,12 @@ if [[ "$push_yn" == "n" ]]; then
              ~/mjnurse/mjnurse-website \
              ~/mjnurse/mjnurse.github.io \
             ; do
-        cd $d
-        if [[ "$(git status --short)" != "" ]]; then
-            echo $"${ccya}- Uncommitted changes in repo: ${clcya}$d${cdef}"
-            changes_yn=y
+        if [[ -d $d ]]; then
+            cd $d
+            if [[ "$(git status --short)" != "" ]]; then
+                cecho cya "Uncommitted changes in repo: ${clcya}$d"
+                changes_yn=y
+            fi
         fi
     done
     if [[ "$changes_yn" == "y" ]]; then
@@ -100,30 +102,38 @@ for d in ~/mjnurse/bash \
          ~/mjnurse/mjnurse-website \
          ~/mjnurse/mjnurse.github.io \
         ; do
-    cd $d
-    if [[ "$(git status --short)" != "" ]]; then
-        echo
-        cecho lmag "------------------------------------------------------------"
-        cecho lmag "Repository: $d"
-        cecho lmag "------------------------------------------------------------"
-        git status
-        echo
-        printf "${clcya}Commit and Push changes in repo (Y/N) or view diff (D) [dyN]? ${cdef}"
-        read yn
-        if [[ "${yn^}" == "D" ]]; then
-            git diff
-            printf "${clcya}Commit and Push changes in repo [yN]? ${cdef}"
-            read yn
-        fi
-        if [[ "${yn^}" == "Y" ]]; then
-            printf "${clcya}Commit Message (Blank to use 'Various'): ${cdef}" 
-            read cm
-            if [[ -z "$cm" ]]; then
-                cm="Various"
-            fi
-            git add .
-            git commit -m "$cm"
-            git push
+    if [[ -d $d ]]; then
+        cd $d
+        if [[ "$(git status --short)" != "" ]]; then
+            echo
+            cecho lmag "------------------------------------------------------------"
+            cecho lmag "Repository: $d"
+            cecho lmag "------------------------------------------------------------"
+            git status
+            yn=""
+            while [[ "${yn^}" != "Y" && "${yn^}" != "N" ]]; do
+                echo
+                printf "${clcya}Commit and Push changes with comment Various (YN), custom comment (C) or view diff (D) [cdyN]? ${cdef}"
+                read yn
+                yn="${yn:-N}"
+
+                if [[ "${yn^}" == "D" ]]; then
+                    git diff
+                fi
+                if [[ "${yn^}" == "C" ]]; then
+                    printf "${clcya}Commit Message: ${cdef}" 
+                    read cm
+                    yn="Y"
+                else
+                    cm="Various"
+                    echo -e $"${clcya}Using default commit message:${cdef} Various"
+                fi
+                if [[ "${yn^}" == "Y" ]]; then
+                    git add .
+                    git commit -m "$cm"
+                    git push
+                fi
+            done
         fi
     fi
 done
