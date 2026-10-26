@@ -2,6 +2,19 @@
 title: 3wp: Generates a random 3 word password
 ---
 
+## Demo
+
+<pre style='background: black; color: white; margin-top: 20px;'>
+$ 3wp
+pitched-tories-bonded
+$ 3wp
+overpricing-misfeasances-sporing
+$ 
+</pre>
+
+
+## Script
+
 ```bash
 #!/usr/bin/env bash
 help_text="
