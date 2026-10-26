@@ -1,6 +1,6 @@
 /* Light theme syntax highlighting */
 pre { 
-  line-height: 125%; 
+  line-height: 150%; 
   font-family: 'Monaco', 'Menlo', 'Consolas', 'Courier New', monospace;
   font-size: small;
   padding: 1.2em;
@@ -105,7 +105,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
 /* Dark theme syntax highlighting */
 .dark pre { 
-  line-height: 125%;
+  line-height: 150%;
   padding: 1.2em;
   border-radius: 8px;
   overflow-x: auto;
