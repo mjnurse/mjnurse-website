@@ -1,5 +1,5 @@
 ---
-title: file-watch-do - Watch a file or directory and each time it or a member is modified run a command
+title: file-watch-do: Watch a file or directory and each time it or a member is modified run a command
 ---
 
 ```bash

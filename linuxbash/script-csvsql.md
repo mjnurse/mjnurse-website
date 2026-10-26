@@ -1,5 +1,5 @@
 ---
-title: csvsql - Run a SQL query over a csv file
+title: csvsql: Run a SQL query over a csv file
 ---
 
 ```bash

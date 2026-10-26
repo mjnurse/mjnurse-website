@@ -1,5 +1,5 @@
 ---
-title: 3wp - Generates a random 3 word password
+title: 3wp: Generates a random 3 word password
 ---
 
 ```bash

@@ -1,5 +1,5 @@
 ---
-title: clr - Check Local Repositories for uncommitted changes
+title: clr: Check Local Repositories for uncommitted changes
 ---
 
 ```bash

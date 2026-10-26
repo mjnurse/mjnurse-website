@@ -1,5 +1,5 @@
 ---
-title: tot - Sum, average, min, max calculator with size unit support
+title: tot: Sum, average, min, max calculator with size unit support
 ---
 
 ```bash

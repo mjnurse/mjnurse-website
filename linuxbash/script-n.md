@@ -1,5 +1,5 @@
 ---
-title: n - Record and query notes
+title: n: Record and query notes
 ---
 
 ```bash

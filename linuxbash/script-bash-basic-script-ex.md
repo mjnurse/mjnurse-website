@@ -1,5 +1,5 @@
 ---
-title: bash-basic-script-ex - Example Basic Bash Script
+title: bash-basic-script-ex: Example Basic Bash Script
 ---
 
 ```bash

@@ -1,5 +1,5 @@
 ---
-title: gen-fake - Generate fake data
+title: gen-fake: Generate fake data
 ---
 
 ```bash

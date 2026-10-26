@@ -1,5 +1,5 @@
 ---
-title: api-doc - Generates API endpoint documentation in markdown format based on provided parameters, request JSON, and response details.
+title: api-doc: Generates API endpoint documentation in markdown format based on provided parameters, request JSON, and response details.
 ---
 
 ```bash

@@ -1,5 +1,5 @@
 ---
-title: drawio - Launch Draw.io application with specified file or URL
+title: drawio: Launch Draw.io application with specified file or URL
 ---
 
 ```bash

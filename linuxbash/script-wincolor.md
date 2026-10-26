@@ -1,5 +1,5 @@
 ---
-title: wincolor - Change terminal background and text colors
+title: wincolor: Change terminal background and text colors
 ---
 
 ```bash

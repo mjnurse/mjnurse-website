@@ -1,5 +1,5 @@
 ---
-title: help-text-opts-popu - Example Bash Script
+title: help-text-opts-popu: Example Bash Script
 ---
 
 ```bash

@@ -1,5 +1,5 @@
 ---
-title: gen-bookmark-page - Generates bookmark web pages from bookmarks JSON files
+title: gen-bookmark-page: Generates bookmark web pages from bookmarks JSON files
 ---
 
 ```bash

@@ -1,5 +1,5 @@
 ---
-title: utils - Some bash Utility Functions
+title: utils: Some bash Utility Functions
 ---
 
 ```bash

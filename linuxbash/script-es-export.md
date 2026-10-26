@@ -1,5 +1,5 @@
 ---
-title: es-export - Export Elasticsearch index to bulk-compatible JSONL format
+title: es-export: Export Elasticsearch index to bulk-compatible JSONL format
 ---
 
 ```bash

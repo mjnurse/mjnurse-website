@@ -1,5 +1,5 @@
 ---
-title: gen-python - Generates a python script from a template
+title: gen-python: Generates a python script from a template
 ---
 
 ```bash

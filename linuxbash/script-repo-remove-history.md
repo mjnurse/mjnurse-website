@@ -1,5 +1,5 @@
 ---
-title: repo-remove-history - Remove entire commit history from the current Git repo and push to origin
+title: repo-remove-history: Remove entire commit history from the current Git repo and push to origin
 ---
 
 ```bash

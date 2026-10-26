@@ -1,5 +1,5 @@
 ---
-title: backup - Creates dated zip backups and copies them to BACKUP_DIR
+title: backup: Creates dated zip backups and copies them to BACKUP_DIR
 ---
 
 ```bash

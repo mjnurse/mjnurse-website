@@ -1,5 +1,5 @@
 ---
-title: csvplot - Generates a HTML page containing a Google Chart plotting the csv data
+title: csvplot: Generates a HTML page containing a Google Chart plotting the csv data
 ---
 
 ```bash

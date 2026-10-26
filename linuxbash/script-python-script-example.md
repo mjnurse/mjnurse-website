@@ -1,5 +1,5 @@
 ---
-title: python-script-example - Example Python Script
+title: python-script-example: Example Python Script
 ---
 
 ```bash

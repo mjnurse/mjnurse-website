@@ -1,5 +1,5 @@
 ---
-title: sqlite-load-csv - Load a csv file into a sqlite3 database
+title: sqlite-load-csv: Load a csv file into a sqlite3 database
 ---
 
 ```bash

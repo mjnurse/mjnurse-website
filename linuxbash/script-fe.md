@@ -1,5 +1,5 @@
 ---
-title: fe - Search for a file and edit
+title: fe: Search for a file and edit
 ---
 
 ```bash

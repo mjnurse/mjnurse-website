@@ -1,5 +1,5 @@
 ---
-title: es-import - Import bulk-compatible JSONL format into Elasticsearch index
+title: es-import: Import bulk-compatible JSONL format into Elasticsearch index
 ---
 
 ```bash

@@ -1,5 +1,5 @@
 ---
-title: record-shell - Record shell session - saving as HTML
+title: record-shell: Record shell session - saving as HTML
 ---
 
 ```bash

@@ -1,5 +1,5 @@
 ---
-title: pwd-gen - Random Password Generator
+title: pwd-gen: Random Password Generator
 ---
 
 ```bash

@@ -1,5 +1,5 @@
 ---
-title: jsonl-json - Convert between JSON and JSONL formats
+title: jsonl-json: Convert between JSON and JSONL formats
 ---
 
 ```bash

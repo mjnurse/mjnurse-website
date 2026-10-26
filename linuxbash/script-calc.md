@@ -1,5 +1,5 @@
 ---
-title: calc - Command line calculator
+title: calc: Command line calculator
 ---
 
 ```bash

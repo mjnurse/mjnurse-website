@@ -1,5 +1,5 @@
 ---
-title: rep - Repeats a command each time you press return
+title: rep: Repeats a command each time you press return
 ---
 
 ```bash

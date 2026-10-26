@@ -1,5 +1,5 @@
 ---
-title: gen-bash-func - Generates code and header of a bash function
+title: gen-bash-func: Generates code and header of a bash function
 ---
 
 ```bash

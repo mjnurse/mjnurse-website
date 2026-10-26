@@ -1,5 +1,5 @@
 ---
-title: mr - Find most recent files matching a pattern
+title: mr: Find most recent files matching a pattern
 ---
 
 ```bash

@@ -1,5 +1,5 @@
 ---
-title: pack - Compresses and converts files base64 to copy and paste into a command line session
+title: pack: Compresses and converts files base64 to copy and paste into a command line session
 ---
 
 ```bash

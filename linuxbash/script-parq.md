@@ -1,5 +1,5 @@
 ---
-title: parq - A bash utility for viewing Apache Parquet files in JSON, CSV, or schema format
+title: parq: A bash utility for viewing Apache Parquet files in JSON, CSV, or schema format
 ---
 
 ```bash

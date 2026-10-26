@@ -1,5 +1,5 @@
 ---
-title: or - Connect to oracle using sqlplus
+title: or: Connect to oracle using sqlplus
 ---
 
 ```bash

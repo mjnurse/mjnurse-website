@@ -1,5 +1,5 @@
 ---
-title: h - Extracts and displays the help_lines
+title: h: Extracts and displays the help_lines
 ---
 
 ```bash

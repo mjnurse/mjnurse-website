@@ -1,5 +1,5 @@
 ---
-title: fsa - A file system analyzer for finding duplicates and analyzing disk usage
+title: fsa: A file system analyzer for finding duplicates and analyzing disk usage
 ---
 
 ```bash

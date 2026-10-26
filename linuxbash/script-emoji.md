@@ -1,5 +1,5 @@
 ---
-title: emoji - Search and find Emoji characters
+title: emoji: Search and find Emoji characters
 ---
 
 ```bash

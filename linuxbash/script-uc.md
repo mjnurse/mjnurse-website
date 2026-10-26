@@ -1,5 +1,5 @@
 ---
-title: uc - Search and find Unicode characters and icons
+title: uc: Search and find Unicode characters and icons
 ---
 
 ## Demo

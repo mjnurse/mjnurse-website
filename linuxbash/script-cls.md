@@ -1,5 +1,5 @@
 ---
-title: cls - Clear terminal and putty terminal buffer
+title: cls: Clear terminal and putty terminal buffer
 ---
 
 ```bash

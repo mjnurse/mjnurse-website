@@ -1,5 +1,5 @@
 ---
-title: keep-delete - Runs through a set if files prompting for keep (move, rename) or delete
+title: keep-delete: Runs through a set if files prompting for keep (move, rename) or delete
 ---
 
 ```bash

@@ -1,5 +1,5 @@
 ---
-title: crreadme - Creates a README.md document from READMEscr.md
+title: crreadme: Creates a README.md document from READMEscr.md
 ---
 
 ```bash

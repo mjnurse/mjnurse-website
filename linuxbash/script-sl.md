@@ -1,5 +1,5 @@
 ---
-title: sl - An interactive SQLite shell wrapper with enhanced CLI features
+title: sl: An interactive SQLite shell wrapper with enhanced CLI features
 ---
 
 ```bash

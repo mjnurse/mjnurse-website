@@ -1,5 +1,5 @@
 ---
-title: imp - Improve text using Claude AI
+title: imp: Improve text using Claude AI
 ---
 
 ```bash

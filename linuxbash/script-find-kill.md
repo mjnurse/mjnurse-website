@@ -1,5 +1,5 @@
 ---
-title: find-kill - Find and kill processes interactively
+title: find-kill: Find and kill processes interactively
 ---
 
 ```bash

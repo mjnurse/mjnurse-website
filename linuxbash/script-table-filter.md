@@ -1,5 +1,5 @@
 ---
-title: table-filter - Python tool for filtering, grouping, and aggregating tabular data from stdin
+title: table-filter: Python tool for filtering, grouping, and aggregating tabular data from stdin
 ---
 
 ```bash

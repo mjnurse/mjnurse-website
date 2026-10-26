@@ -1,5 +1,5 @@
 ---
-title: gen-bash - Generates a bash script from a template
+title: gen-bash: Generates a bash script from a template
 ---
 
 ```bash

@@ -1,5 +1,5 @@
 ---
-title: parameters-function - Contains a function to parse and print details about script parameters
+title: parameters-function: Contains a function to parse and print details about script parameters
 ---
 
 ```bash

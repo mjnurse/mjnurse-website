@@ -1,5 +1,5 @@
 ---
-title: es-cp - Copy Elasticsearch index to new index with same settings and mappings
+title: es-cp: Copy Elasticsearch index to new index with same settings and mappings
 ---
 
 ```bash

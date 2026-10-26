@@ -1,5 +1,5 @@
 ---
-title: extract - Universal archive extractor
+title: extract: Universal archive extractor
 ---
 
 ```bash

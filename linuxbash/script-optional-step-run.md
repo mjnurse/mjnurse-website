@@ -1,5 +1,5 @@
 ---
-title: optional-step-run - A script which prompts a user to decide if a step should be run
+title: optional-step-run: A script which prompts a user to decide if a step should be run
 ---
 
 ```bash

@@ -1,5 +1,5 @@
 ---
-title: edge - Launches the Microsoft Edge browser with the specified path or URL
+title: edge: Launches the Microsoft Edge browser with the specified path or URL
 ---
 
 ```bash

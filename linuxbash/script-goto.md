@@ -1,5 +1,5 @@
 ---
-title: goto - Quickly navigate to frequently used directories
+title: goto: Quickly navigate to frequently used directories
 ---
 
 ```bash

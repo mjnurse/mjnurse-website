@@ -1,5 +1,5 @@
 ---
-title: parq-to-json - Example Bash Script
+title: parq-to-json: Example Bash Script
 ---
 
 ```bash

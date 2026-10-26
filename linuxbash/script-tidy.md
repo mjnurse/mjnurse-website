@@ -1,5 +1,5 @@
 ---
-title: tidy - Tidies filenames and fixes issues such as permission issues with files in the specified directory
+title: tidy: Tidies filenames and fixes issues such as permission issues with files in the specified directory
 ---
 
 ```bash

@@ -1,5 +1,5 @@
 ---
-title: gvim - Runs windows gvim and fixes file paths
+title: gvim: Runs windows gvim and fixes file paths
 ---
 
 ```bash

@@ -1,5 +1,5 @@
 ---
-title: sck - Query shortcut keys - Options to add edit delete
+title: sck: Query shortcut keys - Options to add edit delete
 ---
 
 ```bash

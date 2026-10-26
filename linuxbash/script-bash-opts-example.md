@@ -1,5 +1,5 @@
 ---
-title: bash-opts-example - Example Bash script processing short and long command-line options, including grouped short options
+title: bash-opts-example: Example Bash script processing short and long command-line options, including grouped short options
 ---
 
 ```bash

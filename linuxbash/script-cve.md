@@ -1,5 +1,5 @@
 ---
-title: cve - CVE Lookup
+title: cve: CVE Lookup
 ---
 
 ```bash

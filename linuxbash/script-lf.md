@@ -1,5 +1,5 @@
 ---
-title: lf - A script to recursively list folders and show folder details
+title: lf: A script to recursively list folders and show folder details
 ---
 
 ```bash
