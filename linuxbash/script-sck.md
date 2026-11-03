@@ -3,7 +3,7 @@ title: sck: Query shortcut keys - Options to add edit delete
 ---
 
 ```bash
-#!/bin/bash
+#!/usr/bin/env bash
 help_text="
 NAME
     sck - Query shortcut keys.  Options to add, edit, delete.

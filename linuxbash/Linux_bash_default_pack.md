@@ -12,7 +12,7 @@ into a linux environment using only a command line terminal.
 # --------------------------------------------------------------------------------------------------
 # FILE: file-watch-do 
 # --------------------------------------------------------------------------------------------------
-echo 'H4sIAEQ+6moCA7VW33PiNhB+11+xFWYc0hGEm7mHJoE2cyF3mWl+DJDpAzCMsWWsBsuuLF8uc+R/v5VsbIfk2us01QtCu9
+echo 'H4sIAJpK6moCA7VW33PiNhB+11+xFWYc0hGEm7mHJoE2cyF3mWl+DJDpAzCMsWWsBsuuLF8uc+R/v5VsbIfk2us01QtCu9
 pvd79vBa2fenmmeishe1x+hpWXRSTim3Sp+Rc9oOT67GpEAFcoNpw9eNqPWJAAgz/MFjx7DgeJgkAo7utEPXbAkwFwD81axByEBp
 FBnAQiFDwAlUu85idxjG5dQu4mZx9fg5glqRaJzBZwajGkF/MhnJYXhzDbbSH1FNo0V9lwQcjN7fTy5npCbEgWbhkLFf8r59J/hN
 OM+4kMsqE1mjXhGnTEofZJQvAj7t9nICSU/l0456GXb2wl/fIUcz8fTT6MLy2gjfjjTbGYxgudSv8HoSOENJbqmsGzkb/bvrO76a
@@ -29,7 +29,7 @@ n+Y5J2qhNZ9Ge/sjrjXfcabWT/YdE6zl51SCqMc3ncEPKbYu6ivn0hFNOGD0mcbvBvD33z+MSy9A2KX5
 # --------------------------------------------------------------------------------------------------
 # FILE: cls 
 # --------------------------------------------------------------------------------------------------
-echo 'H4sIAEQ+6moCA5WQvU7DMBRG9/sUF3fIAkkhE0OHqFRQJFrUnwmkyHZuiKnjRPY1oW9PEEidkMp6pO/o6JtcZDH4TBmXkf
+echo 'H4sIAJpK6moCA5WQvU7DMBRG9/sUF3fIAkkhE0OHqFRQJFrUnwmkyHZuiKnjRPY1oW9PEEidkMp6pO/o6JtcZDH4TBmXkf
 tAJUMDDdm+ZPrkmYBV8bQARG0DXuHckvTI5FvjpEXpKuwj8/GEVKxr8gD7bXH/uwO4W2znm+XzbrlejehcSQpQ7HcP6824ad9d9I
 HSN8NNVKnpxpib6fUtiJ9YaxzNxLlmAQOpsqKg/z3spT6ULbWK/EyMZxkdLiuqZbQsACZYdRRcwijtII8Bh84fsDY+MLJpCX0XR3
 fokAejKYXeG8c1Jq/TPH/JHxPQ3yV/4S/D1RG9rAEAAA==
@@ -37,7 +37,7 @@ fokAejKYXeG8c1Jq/TPH/JHxPQ3yV/4S/D1RG9rAEAAA==
 # --------------------------------------------------------------------------------------------------
 # FILE: calc 
 # --------------------------------------------------------------------------------------------------
-echo 'H4sIAEQ+6moCA41UXVPiMBR9z6+4hjoIIwbYfRLrjLiO67h+jOCTukxaAs1aWiZJERf573vTQoEVtZnJ0Nyce+5H7qG0wx
+echo 'H4sIAJpK6moCA41UXVPiMBR9z6+4hjoIIwbYfRLrjLiO67h+jOCTukxaAs1aWiZJERf573vTQoEVtZnJ0Nyce+5H7qG0wx
 KtmCcjJqIJeFwHJBDhuGfE1LiUXJ9cnRHA5fPQhxqcxqMRj/oQykiktiTkJlaE3HdOzteQD/HYyDjST3C0ROHxmJCb2+7FzXUnRd
 aCt1rNRktPdnWC+AWsBWz8A5LBJMJkZITivpETkaN/8STyA+ARrN3CnudX1lJbkmgk0fKv0HA04WEijnOa0ziaCGWWdjAxXLb34Q
 r3Oe4u7ts20vw465zeXaT5p74XEZhg1QWsDxItoDwtwyBWMEpCI8fh635mVZnVeoyVmMg40aCERhBSn9x3f97cpayjP1GitDgYSh
@@ -65,7 +65,7 @@ Bad option: -m
 # --------------------------------------------------------------------------------------------------
 # FILE: file-watch-do 
 # --------------------------------------------------------------------------------------------------
-echo 'H4sIAEQ+6moCA7VW33PiNhB+11+xFWYc0hGEm7mHJoE2cyF3mWl+DJDpAzCMsWWsBsuuLF8uc+R/v5VsbIfk2us01QtCu9
+echo 'H4sIAJpK6moCA7VW33PiNhB+11+xFWYc0hGEm7mHJoE2cyF3mWl+DJDpAzCMsWWsBsuuLF8uc+R/v5VsbIfk2us01QtCu9
 pvd79vBa2fenmmeishe1x+hpWXRSTim3Sp+Rc9oOT67GpEAFcoNpw9eNqPWJAAgz/MFjx7DgeJgkAo7utEPXbAkwFwD81axByEBp
 FBnAQiFDwAlUu85idxjG5dQu4mZx9fg5glqRaJzBZwajGkF/MhnJYXhzDbbSH1FNo0V9lwQcjN7fTy5npCbEgWbhkLFf8r59J/hN
 OM+4kMsqE1mjXhGnTEofZJQvAj7t9nICSU/l0456GXb2wl/fIUcz8fTT6MLy2gjfjjTbGYxgudSv8HoSOENJbqmsGzkb/bvrO76a
@@ -82,7 +82,7 @@ n+Y5J2qhNZ9Ge/sjrjXfcabWT/YdE6zl51SCqMc3ncEPKbYu6ivn0hFNOGD0mcbvBvD33z+MSy9A2KX5
 # --------------------------------------------------------------------------------------------------
 # FILE: cls 
 # --------------------------------------------------------------------------------------------------
-echo 'H4sIAEQ+6moCA5WQvU7DMBRG9/sUF3fIAkkhE0OHqFRQJFrUnwmkyHZuiKnjRPY1oW9PEEidkMp6pO/o6JtcZDH4TBmXkf
+echo 'H4sIAJpK6moCA5WQvU7DMBRG9/sUF3fIAkkhE0OHqFRQJFrUnwmkyHZuiKnjRPY1oW9PEEidkMp6pO/o6JtcZDH4TBmXkf
 tAJUMDDdm+ZPrkmYBV8bQARG0DXuHckvTI5FvjpEXpKuwj8/GEVKxr8gD7bXH/uwO4W2znm+XzbrlejehcSQpQ7HcP6824ad9d9I
 HSN8NNVKnpxpib6fUtiJ9YaxzNxLlmAQOpsqKg/z3spT6ULbWK/EyMZxkdLiuqZbQsACZYdRRcwijtII8Bh84fsDY+MLJpCX0XR3
 fokAejKYXeG8c1Jq/TPH/JHxPQ3yV/4S/D1RG9rAEAAA==
@@ -90,7 +90,7 @@ fokAejKYXeG8c1Jq/TPH/JHxPQ3yV/4S/D1RG9rAEAAA==
 # --------------------------------------------------------------------------------------------------
 # FILE: calc 
 # --------------------------------------------------------------------------------------------------
-echo 'H4sIAEQ+6moCA41UXVPiMBR9z6+4hjoIIwbYfRLrjLiO67h+jOCTukxaAs1aWiZJERf573vTQoEVtZnJ0Nyce+5H7qG0wx
+echo 'H4sIAJpK6moCA41UXVPiMBR9z6+4hjoIIwbYfRLrjLiO67h+jOCTukxaAs1aWiZJERf573vTQoEVtZnJ0Nyce+5H7qG0wx
 KtmCcjJqIJeFwHJBDhuGfE1LiUXJ9cnRHA5fPQhxqcxqMRj/oQykiktiTkJlaE3HdOzteQD/HYyDjST3C0ROHxmJCb2+7FzXUnRd
 aCt1rNRktPdnWC+AWsBWz8A5LBJMJkZITivpETkaN/8STyA+ARrN3CnudX1lJbkmgk0fKv0HA04WEijnOa0ziaCGWWdjAxXLb34Q
 r3Oe4u7ts20vw465zeXaT5p74XEZhg1QWsDxItoDwtwyBWMEpCI8fh635mVZnVeoyVmMg40aCERhBSn9x3f97cpayjP1GitDgYSh

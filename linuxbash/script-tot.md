@@ -34,7 +34,7 @@ $
 ## Script
 
 ```bash
-#!/bin/bash
+#!/usr/bin/env bash
 help_text="
 NAME
     tot - Sum, average, min, max for a list of values with optional size units.
