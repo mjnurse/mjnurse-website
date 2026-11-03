@@ -93,10 +93,12 @@ while [[ "$1" != "" ]]; do
                 echo "Directory name details must not end with a /"
                 exit 1
             fi
-            ls -d "$1"* 2>/dev/null | sed 's/\(^.*\/\)\(.*\)/\2, \1\2/' >> $0.dat
-                cat $0.dat | sed '/^ *$/d;
-                              s/,/                                            /; 
-                              s/\(^................\)[^ ]*   *\(.*\)/\1, \2/' | sort -u > $0.tmp
+            ls -d "$1"* 2>/dev/null | sed 's/\(^.*\/\)\(.*\)/\L\2\E, \1\2/' >> $0.dat
+                cat $0.dat | sed '
+                    /^ *$/d;
+                    s/,/                                            /; 
+                    s/\(^................\)[^ ]*   *\(.*\)/\1, \2/
+                ' | sort -u > $0.tmp
             mv $0.tmp $0.dat
             exit
             ;;
@@ -134,13 +136,14 @@ fi
 
 egrep ".*$1.*," $0.dat > $tf
 
+
 if [[ "$(wc -l < $tf)" == "0" ]]; then
     echo "No match found for '$1'"
     rm $tf
     exit 1
 fi
 
-if [[ "$(wc -l < $tf)" == "1" ]]; then
+if [[ "$(wc -l < $tf | tr -d ' ')" == "1" ]]; then
     cat $tf | sed 's/^[^,]*, *//' > $0.tmp
 else
     echo "Multiple matches found for '$1':"

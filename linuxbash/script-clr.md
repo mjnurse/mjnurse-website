@@ -104,12 +104,13 @@ for d in ~/mjnurse/bash \
         ; do
     if [[ -d $d ]]; then
         cd $d
+        echo "Checking repository: $d"
+        git fetch
         if [[ "$(git status --short)" != "" ]]; then
             echo
             cecho lmag "------------------------------------------------------------"
             cecho lmag "Repository: $d"
             cecho lmag "------------------------------------------------------------"
-            git pull --rebase
             git status
             yn=""
             while [[ "${yn^}" != "Y" && "${yn^}" != "N" ]]; do
@@ -132,6 +133,7 @@ for d in ~/mjnurse/bash \
                 if [[ "${yn^}" == "Y" ]]; then
                     git add .
                     git commit -m "$cm"
+                    git pull --rebase
                     git push
                 fi
             done
