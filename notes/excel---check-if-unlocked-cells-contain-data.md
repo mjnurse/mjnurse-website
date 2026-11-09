@@ -26,4 +26,4 @@ With this:
 
 1) If you make the last line `num_unlocked_and_populated = 0` this tells you if the (form) sheet is 'clear'.
 
-2) If you make the last line `num_unlocked_and_populated = SUM(unlocked*1)` this tells you if the (form) sheet is fully populated.  Note: The `*1` converts the True/False values to 0 and 1.
+2) If you make the last line `num_unlocked_and_populated = SUM(unlocked*1)` this tells you if the (form) sheet is fully populated.  Note: The `*1` converts the True/False values to 1 and 0.
