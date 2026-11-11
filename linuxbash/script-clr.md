@@ -124,16 +124,16 @@ function pull_rebase_and_push {
             cecho lred "Rebase conflict encountered in $repo_dir!"
             git status --short
             local res=""
-            while [[ ! "${res^}" =~ ^[OTA]$ ]]; do
+            while [[ ! "${res^}" =~ ^[LRA]$ ]]; do
                 echo
-                printf "${clyel}Resolve conflict using [O]urs (local), [T]heirs (remote), or [A]bort rebase [otA]? ${cdef}"
+                printf "${clyel}Resolve conflict keeping [L]ocal changes, [R]emote changes, or [A]bort rebase [lrA]? ${cdef}"
                 read -r res
                 res="${res:-A}"
             done
             case "${res^}" in
-                O)
+                L)
                     git diff --name-only --diff-filter=U | while IFS= read -r file; do
-                        [[ -n "$file" ]] && git checkout --ours -- "$file" && git add -- "$file"
+                        [[ -n "$file" ]] && git checkout --theirs -- "$file" && git add -- "$file"
                     done
                     if ! GIT_EDITOR=true git rebase --continue; then
                         cecho lred "Failed to continue rebase automatically. Aborting rebase."
@@ -141,9 +141,9 @@ function pull_rebase_and_push {
                         return 1
                     fi
                     ;;
-                T)
+                R)
                     git diff --name-only --diff-filter=U | while IFS= read -r file; do
-                        [[ -n "$file" ]] && git checkout --theirs -- "$file" && git add -- "$file"
+                        [[ -n "$file" ]] && git checkout --ours -- "$file" && git add -- "$file"
                     done
                     if ! GIT_EDITOR=true git rebase --continue; then
                         cecho lred "Failed to continue rebase automatically. Aborting rebase."
@@ -321,5 +321,6 @@ for d in "${repos[@]}"; do
         fi
     fi
 done
+
 
 ```
