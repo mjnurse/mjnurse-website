@@ -76,7 +76,10 @@ The notes captured in the Linux notes tool = `n`.
 <tr><td><code>${var^^} ${var,,}</code></td><td>var to UPPERCASE, lowercase</td></tr>
 <tr><td><code>ALT-#</code></td><td>Convert current command to a comment</td></tr>
 <tr><td><code>COLUMNS=1; PS3="Choose: "; select v in *; do [[ -n $v ]] && break; done</code></td><td>Generate a numbered list of options</td></tr>
+<tr><td><code>CTRL-A, CTRL-E</code></td><td>Move beginning / end of line</td></tr>
+<tr><td><code>CTRL-W, CTRL-U, CTRL-K</code></td><td>Delete word, to start of line, to end of line</td></tr>
 <tr><td><code>CTRL-X CTRL-E</code></td><td>Edit current command line</td></tr>
+<tr><td><code>cd -</code></td><td>Return to previous directory</td></tr>
 <tr><td><code>cp file.txt{,.bak}</code></td><td>cp file.txt file.txt.bak</td></tr>
 <tr><td><code>echo {0..10..2}</code></td><td>0 -&gt; 10 in steps of 2: 0 2 4 6 8 10</td></tr>
 <tr><td><code>echo {1,2}{a..e}</code></td><td>1a 1b 1c 1d 1e 2a 2b 2c 2d 2e</td></tr>
