@@ -5,7 +5,7 @@ The notes captured in the Linux notes tool = `n`.
 ### 7zip
 
 <table>
-<tr><td><code>7z a -p -mhe=on archive.7z &lt;files_or_folders&gt;</code></td><td>-mhe=on - encrypt file contents and filenames/headers.</td></tr>
+<tr><td><code>7z a -p -mhe=on archive.7z &lt;files_or_folders&gt;</code></td><td>-mhe=on - encrypt file contents and filenames/headers</td></tr>
 </table>
 
 ### ES
@@ -48,7 +48,7 @@ The notes captured in the Linux notes tool = `n`.
 <tr><td><code>awk 'BEGIN {OFS="-&gt;"}{ORS="\|"}{print $1, $2}' file</code></td><td>Output Field Separator, Output Record Separator (replacing newline)</td></tr>
 <tr><td><code>awk 'BEGIN {RS=""} {print $0}' file</code></td><td>Treat blank-line-separated paragraphs as records</td></tr>
 <tr><td><code>awk 'BEGIN {print "head"} {print $0} END {print "---\n" NR}' file</code></td><td>BEGIN/END</td></tr>
-<tr><td><code>awk 'NR == 1 {mn=mx=$1} $1&lt;mn {mn=$1} $1&gt;=mx {mx=$1} END {print mn, mx}' numfile</code></td><td>Can't use BEGIN as $1 not set for BEGIN.</td></tr>
+<tr><td><code>awk 'NR == 1 {mn=mx=$1} $1&lt;mn {mn=$1} $1&gt;=mx {mx=$1} END {print mn, mx}' numfile</code></td><td>Can't use BEGIN as $1 not set for BEGIN</td></tr>
 <tr><td><code>awk 'function sz(v) {if (v &lt; 5) return "S" else if (v &gt;= 9) return "L" else return "M"} {print $1, sz($1)}' file</code></td><td>functions</td></tr>
 <tr><td><code>awk '{count[$1]++} END {for (x in count) print x, count[x]}' file</code></td><td>count is array indexed by $1 value containing count</td></tr>
 <tr><td><code>awk '{for (i=1; i&lt;=NF; i++) {print i, $i}}' file</code></td><td>for loop through all fields, every line</td></tr>
@@ -112,10 +112,16 @@ The notes captured in the Linux notes tool = `n`.
 <tr><td><code>column -t -s"," -N col1,col2</code></td><td>format csv as a table with headings col1, col2</td></tr>
 </table>
 
+### curl
+
+<table>
+<tr><td><code>curl -s https://api.ipify.org</code></td><td>find public ip address</td></tr>
+</table>
+
 ### date
 
 <table>
-<tr><td><code>date -d "1 month ago" +%y-%m-%d</code></td><td>Outputs date 1 month ago in YY-MM-DD format.</td></tr>
+<tr><td><code>date -d "1 month ago" +%y-%m-%d</code></td><td>Outputs date 1 month ago in YY-MM-DD format</td></tr>
 </table>
 
 ### find
@@ -125,6 +131,7 @@ The notes captured in the Linux notes tool = `n`.
 <tr><td><code>find . -type d -name ".git"</code></td><td>Find directories</td></tr>
 <tr><td><code>find . -type d -name .git -prune -o -type f -name *.py -print</code></td><td>exclude .git directories</td></tr>
 <tr><td><code>find . -type f -mtime +90</code></td><td>Find files last modified at least 90 days ago</td></tr>
+<tr><td><code>find . -type f -mtime -1</code></td><td>find files modified in the last day</td></tr>
 </table>
 
 ### gcp
@@ -136,7 +143,7 @@ The notes captured in the Linux notes tool = `n`.
 ### git
 
 <table>
-<tr><td><code>git checkout tags/&lt;tag name&gt;</code></td><td>checkout a git tag.</td></tr>
+<tr><td><code>git checkout tags/&lt;tag name&gt;</code></td><td>checkout a git tag</td></tr>
 <tr><td><code>git push --set-upstream origin main</code></td><td>set main as default origin branch</td></tr>
 </table>
 
@@ -178,9 +185,9 @@ The notes captured in the Linux notes tool = `n`.
 ### postgres
 
 <table>
-<tr><td><code>ALTER ROLE &lt;username&gt; SET search_path TO &lt;schema name&gt;;</code></td><td>Permanently alter search_path.</td></tr>
-<tr><td><code>SET search_path TO &lt;schema name&gt;;</code></td><td>Alter the schema searched.</td></tr>
-<tr><td><code>SHOW search_path;</code></td><td>show the currently search schema.</td></tr>
+<tr><td><code>ALTER ROLE &lt;username&gt; SET search_path TO &lt;schema name&gt;;</code></td><td>Permanently alter search_path</td></tr>
+<tr><td><code>SET search_path TO &lt;schema name&gt;;</code></td><td>Alter the schema searched</td></tr>
+<tr><td><code>SHOW search_path;</code></td><td>show the currently search schema</td></tr>
 <tr><td><code>export PGPASSWORD=postgres</code></td><td>Set password</td></tr>
 <tr><td><code>export PGPASSWORD=postgres; cat my.sql \\| psql -h localhost -U postgres -d postgres</code></td><td>Run my.sql</td></tr>
 </table>
@@ -208,7 +215,7 @@ The notes captured in the Linux notes tool = `n`.
 <table>
 <tr><td><code>s/de/la&da/</code></td><td>& in replacement is the matched text</td></tr>
 <tr><td><code>sed -E</code></td><td>Extended - can use 's/a+/b/' rather than 's/a\+/b/'</td></tr>
-<tr><td><code>sed -E 's/a+/b/'</code></td><td>one or more a's.</td></tr>
+<tr><td><code>sed -E 's/a+/b/'</code></td><td>one or more a's</td></tr>
 <tr><td><code>sed -E 's/a{2,5}/b/'</code></td><td>between 2 and 5 a's</td></tr>
 </table>
 
@@ -227,8 +234,8 @@ The notes captured in the Linux notes tool = `n`.
 ### tar
 
 <table>
-<tr><td><code>tar -cvzf filename sourcedir</code></td><td>Create tarball.</td></tr>
-<tr><td><code>tar -xvzf &lt;filename&gt;</code></td><td>Extract zipped tarball.</td></tr>
+<tr><td><code>tar -cvzf filename sourcedir</code></td><td>Create tarball</td></tr>
+<tr><td><code>tar -xvzf &lt;filename&gt;</code></td><td>Extract zipped tarball</td></tr>
 </table>
 
 ### tr
