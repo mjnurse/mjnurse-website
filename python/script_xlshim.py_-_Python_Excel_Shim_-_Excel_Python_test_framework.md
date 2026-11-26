@@ -3,6 +3,7 @@ title: xlshim.py - Python Excel Shim - Excel Python test framework
 ---
 
 ```python
+#!/usr/bin/env python3
 """
 Excel Shim - Excel Python test framework
 

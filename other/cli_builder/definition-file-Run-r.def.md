@@ -25,15 +25,11 @@ halt mdm (hm) ::
     mjn-stop-mdm
 
 # ------------------------------------------------------------------------------------------------------------
-= ES / Postgres
+= HO Borders
 # ------------------------------------------------------------------------------------------------------------
 
-start es (se) ::
-    mjn-start-es-pg es
-
-start postgres (sp) ::
-    mjn-start-es-pg pg
-
+restart hob (rh) ::
+    docker compose -f $HOME/ho-borders-poc/docker/docker-compose-apps.yml restart
 
 # ------------------------------------------------------------------------------------------------------------
 = CLI-BUILDER
@@ -71,15 +67,14 @@ _r_complete() {
     done
 
 }
-complete -F _r_complete r @rhe @rsm @rrm @rhm @rse @rsp @rcba
+complete -F _r_complete r @rhe @rsm @rrm @rhm @rrh @rcba
 
 # Shortcut aliases
 alias @rhe='r rhe'
 alias @rsm='r rsm'
 alias @rrm='r rrm'
 alias @rhm='r rhm'
-alias @rse='r rse'
-alias @rsp='r rsp'
+alias @rrh='r rrh'
 alias @rcba='r rcba'
 ```
 
@@ -112,7 +107,7 @@ if [[ "$1" == "help" || "$1" == "rhe" ]]; then
    usage="\x1b[95mhelp \x1b[96m(rhe)\x1b[97m [filter]\x1b[92m # Show help, optionally filtered by pattern\x1b[0m"
    check_params $# 0 "Usage: $usage"
    
-   echo -e "\x1b[95mgenerated:2026-09-14 17:03\x1b[0m"
+   echo -e "\x1b[95mgenerated:2026-11-26 09:06\x1b[0m"
    echo
    filter="$1"
    if [[ -n "$filter" ]]; then
@@ -164,23 +159,14 @@ if [[ "$1 $2" == "halt mdm" || "$1" == "rhm" ]]; then
    mjn-stop-mdm
    exit
 fi
-section="ES / Postgres"
+section="HO Borders"
 
-if [[ "$1 $2" == "start es" || "$1" == "rse" ]]; then
-   [[ "$1" == "rse" ]] && shift || shift 2
-   usage="\x1b[95mstart es \x1b[96m(rse)\x1b[97m\x1b[0m"
+if [[ "$1 $2" == "restart hob" || "$1" == "rrh" ]]; then
+   [[ "$1" == "rrh" ]] && shift || shift 2
+   usage="\x1b[95mrestart hob \x1b[96m(rrh)\x1b[97m\x1b[0m"
    check_params $# 0 "Usage: $usage"
-   print_command " mjn-start-es-pg es"
-   mjn-start-es-pg es
-   exit
-fi
-
-if [[ "$1 $2" == "start postgres" || "$1" == "rsp" ]]; then
-   [[ "$1" == "rsp" ]] && shift || shift 2
-   usage="\x1b[95mstart postgres \x1b[96m(rsp)\x1b[97m\x1b[0m"
-   check_params $# 0 "Usage: $usage"
-   print_command " mjn-start-es-pg pg"
-   mjn-start-es-pg pg
+   print_command " docker compose -f $HOME/ho-borders-poc/docker/docker-compose-apps.yml restart"
+   docker compose -f $HOME/ho-borders-poc/docker/docker-compose-apps.yml restart
    exit
 fi
 section="CLI-BUILDER"

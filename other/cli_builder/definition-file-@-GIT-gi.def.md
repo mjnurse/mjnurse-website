@@ -194,7 +194,7 @@ if [[ "$1" == "help" || "$1" == "gihe" ]]; then
    echo -e "\x1b[92mGIT\x1b[0m"
    echo -e "\x1b[92m---\x1b[0m"
    
-   echo -e "\x1b[95mgenerated:2026-09-14 17:03\x1b[0m"
+   echo -e "\x1b[95mgenerated:2026-11-26 09:06\x1b[0m"
    echo
    filter="$1"
    if [[ -n "$filter" ]]; then
