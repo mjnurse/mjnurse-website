@@ -8,6 +8,25 @@ The notes captured in the Linux notes tool = `n`.
 <tr><td><code>7z a -p -mhe=on archive.7z &lt;files_or_folders&gt;</code></td><td>-mhe=on - encrypt file contents and filenames/headers</td></tr>
 </table>
 
+### ES
+
+<table>
+<tr><td><code>@esql 'SELECT id.value FROM "mdm-example-entity-store-business-all-data"'</code></td><td>Elasticsearch SQL</td></tr>
+</table>
+
+### Excel
+
+<table>
+<tr><td><code>=CELL("protect",A1)=0</code></td><td>Use in conditional formatting to highlight unlocked cells</td></tr>
+<tr><td><code>ALT-DOWN_ARROW</code></td><td>Open Drop-down in Cell</td></tr>
+</table>
+
+### Windows
+
+<table>
+<tr><td>WIN-H - turn on dictation</td></tr>
+</table>
+
 ### apt
 
 <table>
@@ -19,10 +38,18 @@ The notes captured in the Linux notes tool = `n`.
 ### awk
 
 <table>
-<tr><td><code>awk -F, '{print $1, $7}' file</code></td><td>use , as field separator (awk 'BEGIN {FS=","} {print ...) also works</td></tr>
-<tr><td><code>awk -F, '{print $1, $7}' file</code></td><td>use , as field separator (awk 'BEGIN {FS=","} {print ...) also works</td></tr>
-<tr><td><code>awk -v x="$envvar" '$1 == x {print $0}' file</code></td><td>Using environment variables</td></tr>
 <tr><td><code>awk '($1 ~ /re/ \|\| $1 ~/2/) && $2 == "one" && $3 &gt;= 7 {print $5}'</code></td><td>Various matches (!~ /x/ is not match)</td></tr>
+<tr><td><code>awk '/^#/ {next} {print}' file # skip lines starting</code></td><td>('NF == 0 {next} - skip blank lines)</td></tr>
+<tr><td><code>awk '/^aa/,/^bb/ {print $0}' file</code></td><td>output from first line starting 'aa' to the last line starting 'bb'</td></tr>
+<tr><td><code>awk '/error/' file</code></td><td>A regex match anywhere in file</td></tr>
+<tr><td><code>awk 'BEGIN { "date" \| getline nw; close("date"); print "time now: " tolower(nw)}'</code></td><td>run unix date and capture output</td></tr>
+<tr><td><code>awk 'BEGIN { i=1; while (("ls" \| getline f) &gt; 0) { print "file " i++ ": " f } close("ls") }'</code></td><td>loop though command output</td></tr>
+<tr><td><code>awk 'BEGIN {OFS="-&gt;"}{ORS="\|"}{print $1, $2}' file</code></td><td>Output Field Separator, O' Record S' (replacing newline)</td></tr>
+<tr><td><code>awk 'BEGIN {OFS="-&gt;"}{ORS="\|"}{print $1, $2}' file</code></td><td>Output Field Separator, Output Record Separator (replacing newline)</td></tr>
+<tr><td><code>awk 'BEGIN {RS=""} {print $0}' file</code></td><td>Treat blank-line-separated paragraphs as records</td></tr>
+<tr><td><code>awk 'BEGIN {print "head"} {print $0} END {print "---\n" NR}' file</code></td><td>BEGIN/END</td></tr>
+<tr><td><code>awk 'NR == 1 {mn=mx=$1} $1&lt;mn {mn=$1} $1&gt;=mx {mx=$1} END {print mn, mx}' numfile</code></td><td>Can't use BEGIN as $1 not set for BEGIN</td></tr>
+<tr><td><code>awk 'function sz(v) {if (v &lt; 5) return "S" else if (v &gt;= 9) return "L" else return "M"} {print $1, sz($1)}' file</code></td><td>functions</td></tr>
 <tr><td><code>awk '{count[$1]++} END {for (x in count) print x, count[x]}' file</code></td><td>count is array indexed by $1 value containing count</td></tr>
 <tr><td><code>awk '{for (i=1; i&lt;=NF; i++) {print i, $i}}' file</code></td><td>for loop through all fields, every line</td></tr>
 <tr><td><code>awk '{i=1}{while (i&lt;=5) {print i; i++ }}' file</code></td><td>while loop, every line</td></tr>
@@ -33,17 +60,9 @@ The notes captured in the Linux notes tool = `n`.
 <tr><td><code>awk '{print FILENAME, NR, FNR, $0}' file1 file2</code></td><td>NR - record number continues, FNR - resets each file</td></tr>
 <tr><td><code>awk '{printf "%-12s %5d %.2f\n", $1, $2, $3}' file</code></td><td>Formatted output: %12s - left pad, %-12s - right pad</td></tr>
 <tr><td><code>awk '{t += ($1 + $2)} END {print "tot:" t, "avg:" t/NR}' file</code></td><td>Arithmetic</td></tr>
-<tr><td><code>awk '/^#/ {next} {print}' file # skip lines starting</code></td><td>('NF == 0 {next} - skip blank lines)</td></tr>
-<tr><td><code>awk '/^aa/,/^bb/ {print $0}' file</code></td><td>output from first line starting 'aa' to the last line starting 'bb'</td></tr>
-<tr><td><code>awk '/error/' file</code></td><td>A regex match anywhere in file</td></tr>
-<tr><td><code>awk 'BEGIN { "date" \| getline nw; close("date"); print "time now: " tolower(nw)}'</code></td><td>run unix date and capture output</td></tr>
-<tr><td><code>awk 'BEGIN { i=1; while (("ls" \| getline f) &gt; 0) { print "file " i++ ": " f } close("ls") }'</code></td><td>loop though command output</td></tr>
-<tr><td><code>awk 'BEGIN {OFS="-&gt;"}{ORS="\|"}{print $1, $2}' file</code></td><td>Output Field Separator, O' Record S' (replacing newline)</td></tr>
-<tr><td><code>awk 'BEGIN {OFS="-&gt;"}{ORS="\|"}{print $1, $2}' file</code></td><td>Output Field Separator, Output Record Separator (replacing newline)</td></tr>
-<tr><td><code>awk 'BEGIN {print "head"} {print $0} END {print "---\n" NR}' file</code></td><td>BEGIN/END</td></tr>
-<tr><td><code>awk 'BEGIN {RS=""} {print $0}' file</code></td><td>Treat blank-line-separated paragraphs as records</td></tr>
-<tr><td><code>awk 'function sz(v) {if (v &lt; 5) return "S" else if (v &gt;= 9) return "L" else return "M"} {print $1, sz($1)}' file</code></td><td>functions</td></tr>
-<tr><td><code>awk 'NR == 1 {mn=mx=$1} $1&lt;mn {mn=$1} $1&gt;=mx {mx=$1} END {print mn, mx}' numfile</code></td><td>Can't use BEGIN as $1 not set for BEGIN</td></tr>
+<tr><td><code>awk -F, '{print $1, $7}' file</code></td><td>use , as field separator (awk 'BEGIN {FS=","} {print ...) also works</td></tr>
+<tr><td><code>awk -F, '{print $1, $7}' file</code></td><td>use , as field separator (awk 'BEGIN {FS=","} {print ...) also works</td></tr>
+<tr><td><code>awk -v x="$envvar" '$1 == x {print $0}' file</code></td><td>Using environment variables</td></tr>
 <tr><td><code>length($1), tolower($1), toupper($1), index($1, "err:")</code></td><td>index is find</td></tr>
 <tr><td><code>substr($1, 1, 3), sub(/foo.*bar/, "fb"), gsub(/foo/, "bar")</code></td><td>gsub - replace all occurrences</td></tr>
 </table>
@@ -56,12 +75,12 @@ The notes captured in the Linux notes tool = `n`.
 <tr><td><code>#!/usr/bin/env bash</code></td><td>First line bash script</td></tr>
 <tr><td><code>${var^^} ${var,,}</code></td><td>var to UPPERCASE, lowercase</td></tr>
 <tr><td><code>ALT-#</code></td><td>Convert current command to a comment</td></tr>
-<tr><td><code>cd -</code></td><td>Return to previous directory</td></tr>
 <tr><td><code>COLUMNS=1; PS3="Choose: "; select v in *; do [[ -n $v ]] && break; done</code></td><td>Generate a numbered list of options</td></tr>
-<tr><td><code>cp file.txt{,.bak}</code></td><td>cp file.txt file.txt.bak</td></tr>
 <tr><td><code>CTRL-A, CTRL-E</code></td><td>Move beginning / end of line</td></tr>
 <tr><td><code>CTRL-W, CTRL-U, CTRL-K</code></td><td>Delete word, to start of line, to end of line</td></tr>
 <tr><td><code>CTRL-X CTRL-E</code></td><td>Edit current command line</td></tr>
+<tr><td><code>cd -</code></td><td>Return to previous directory</td></tr>
+<tr><td><code>cp file.txt{,.bak}</code></td><td>cp file.txt file.txt.bak</td></tr>
 <tr><td><code>echo {0..10..2}</code></td><td>0 -&gt; 10 in steps of 2: 0 2 4 6 8 10</td></tr>
 <tr><td><code>echo {1,2}{a..e}</code></td><td>1a 1b 1c 1d 1e 2a 2b 2c 2d 2e</td></tr>
 <tr><td><code>o="$(!!)"</code></td><td>Rerun last command and capture output eg. `which f.txt`, `o="$(!!)"`, `vi "$o"`</td></tr>
@@ -78,12 +97,12 @@ The notes captured in the Linux notes tool = `n`.
 ### code
 
 <table>
-<tr><td>ALT+z - Enable word wrap</td></tr>
-<tr><td>CTRL-k v - View markdown and markdown preview side by side</td></tr>
-<tr><td>CTRL+, - Open Settings</td></tr>
-<tr><td>CTRL+; - Find next problem (I added this shortcut)</td></tr>
-<tr><td>CTRL+. - Fix problem</td></tr>
-<tr><td>CTRL+k CTRL+s - Open Keyboard Shortcuts</td></tr>
+<tr><td><code>ALT+z</code></td><td>Enable word wrap</td></tr>
+<tr><td><code>CTRL+,</code></td><td>Open Settings</td></tr>
+<tr><td><code>CTRL+.</code></td><td>Fix problem</td></tr>
+<tr><td><code>CTRL+;</code></td><td>Find next problem (I added this shortcut)</td></tr>
+<tr><td><code>CTRL+k CTRL+s</code></td><td>Open Keyboard Shortcuts</td></tr>
+<tr><td><code>CTRL-k v</code></td><td>View markdown and markdown preview side by side</td></tr>
 </table>
 
 ### column
@@ -105,27 +124,14 @@ The notes captured in the Linux notes tool = `n`.
 <tr><td><code>date -d "1 month ago" +%y-%m-%d</code></td><td>Outputs date 1 month ago in YY-MM-DD format</td></tr>
 </table>
 
-### ES
-
-<table>
-<tr><td><code>@esql 'SELECT id.value FROM "mdm-example-entity-store-business-all-data"'</code></td><td>Elasticsearch SQL</td></tr>
-</table>
-
-### Excel
-
-<table>
-<tr><td><code>=CELL("protect",A1)=0</code></td><td>Use in conditional formatting to highlight unlocked cells</td></tr>
-<tr><td><code>ALT-DOWN_ARROW</code></td><td>Open Drop-down in Cell</td></tr>
-</table>
-
 ### find
 
 <table>
 <tr><td><code>find . -name "*.jar" -exec du -h {} \;</code></td><td>Find the size of jar files</td></tr>
-<tr><td><code>find . -type d -name .git -prune -o -type f -name *.py -print</code></td><td>exclude .git directories</td></tr>
 <tr><td><code>find . -type d -name ".git"</code></td><td>Find directories</td></tr>
-<tr><td><code>find . -type f -mtime -1</code></td><td>find files modified in the last day</td></tr>
+<tr><td><code>find . -type d -name .git -prune -o -type f -name *.py -print</code></td><td>exclude .git directories</td></tr>
 <tr><td><code>find . -type f -mtime +90</code></td><td>Find files last modified at least 90 days ago</td></tr>
+<tr><td><code>find . -type f -mtime -1</code></td><td>find files modified in the last day</td></tr>
 </table>
 
 ### gcp
@@ -160,14 +166,14 @@ The notes captured in the Linux notes tool = `n`.
 ### jq
 
 <table>
-<tr><td><code>jq -r '.field'</code></td><td>Raw output</td></tr>
 <tr><td><code>jq '. \\| length'</code></td><td>Count</td></tr>
-<tr><td><code>jq '.[] \\| {a, b}'</code></td><td>Pick fields</td></tr>
-<tr><td><code>jq '.[] \\| select(x == "y")'</code></td><td>Filter</td></tr>
-<tr><td><code>jq '.[]'</code></td><td>Loop array</td></tr>
 <tr><td><code>jq '.[0]'</code></td><td>Array item</td></tr>
+<tr><td><code>jq '.[] \\| select(x == "y")'</code></td><td>Filter</td></tr>
+<tr><td><code>jq '.[] \\| {a, b}'</code></td><td>Pick fields</td></tr>
+<tr><td><code>jq '.[]'</code></td><td>Loop array</td></tr>
 <tr><td><code>jq '.a.b.c'</code></td><td>Nested field</td></tr>
 <tr><td><code>jq '.field'</code></td><td>Get a field</td></tr>
+<tr><td><code>jq -r '.field'</code></td><td>Raw output</td></tr>
 </table>
 
 ### ln
@@ -180,10 +186,10 @@ The notes captured in the Linux notes tool = `n`.
 
 <table>
 <tr><td><code>ALTER ROLE &lt;username&gt; SET search_path TO &lt;schema name&gt;;</code></td><td>Permanently alter search_path</td></tr>
-<tr><td><code>export PGPASSWORD=postgres</code></td><td>Set password</td></tr>
-<tr><td><code>export PGPASSWORD=postgres; cat my.sql \\| psql -h localhost -U postgres -d postgres</code></td><td>Run my.sql</td></tr>
 <tr><td><code>SET search_path TO &lt;schema name&gt;;</code></td><td>Alter the schema searched</td></tr>
 <tr><td><code>SHOW search_path;</code></td><td>show the currently search schema</td></tr>
+<tr><td><code>export PGPASSWORD=postgres</code></td><td>Set password</td></tr>
+<tr><td><code>export PGPASSWORD=postgres; cat my.sql \\| psql -h localhost -U postgres -d postgres</code></td><td>Run my.sql</td></tr>
 </table>
 
 ### ps
@@ -195,22 +201,22 @@ The notes captured in the Linux notes tool = `n`.
 ### psql
 
 <table>
+<tr><td><code>SET search_path=&lt;schema&gt;[,&lt;schema&gt;];</code></td><td>set current schema(s)</td></tr>
+<tr><td><code>SHOW search_path;</code></td><td>show current schema(s)</td></tr>
 <tr><td><code>\c &lt;db&gt;</code></td><td>connect to database</td></tr>
 <tr><td><code>\d &lt;table&gt;</code></td><td>describe table</td></tr>
 <tr><td><code>\dn</code></td><td>list schemas</td></tr>
 <tr><td><code>\dt</code></td><td>list tables</td></tr>
 <tr><td><code>\l</code></td><td>list databases</td></tr>
-<tr><td><code>SET search_path=&lt;schema&gt;[,&lt;schema&gt;];</code></td><td>set current schema(s)</td></tr>
-<tr><td><code>SHOW search_path;</code></td><td>show current schema(s)</td></tr>
 </table>
 
 ### sed
 
 <table>
 <tr><td><code>s/de/la&da/</code></td><td>& in replacement is the matched text</td></tr>
-<tr><td><code>sed -E 's/a{2,5}/b/'</code></td><td>between 2 and 5 a's</td></tr>
-<tr><td><code>sed -E 's/a+/b/'</code></td><td>one or more a's</td></tr>
 <tr><td><code>sed -E</code></td><td>Extended - can use 's/a+/b/' rather than 's/a\+/b/'</td></tr>
+<tr><td><code>sed -E 's/a+/b/'</code></td><td>one or more a's</td></tr>
+<tr><td><code>sed -E 's/a{2,5}/b/'</code></td><td>between 2 and 5 a's</td></tr>
 </table>
 
 ### sort
@@ -242,19 +248,14 @@ The notes captured in the Linux notes tool = `n`.
 ### vim
 
 <table>
-<tr><td><code>:%!sort -R</code></td><td>Random order - calling external app to order [sed, regex]</td></tr>
 <tr><td><code>/lala\C</code></td><td>Make search case sensitive (..\c - insensitive) [sed, regex]</td></tr>
+<tr><td><code>:%!sort -R</code></td><td>Random order - calling external app to order [sed, regex]</td></tr>
+<tr><td><code>:%s/\%&gt;100v.*/[+]/</code></td><td>\%&gt;100v skips up to col 100. .*/[+]/ replaces any text after with [+]</td></tr>
 <tr><td><code>\a (\A)</code></td><td>alphabetic character [A-Za-z]. Uppercase: non ... [sed, regex]</td></tr>
 <tr><td><code>\d \x (\D \X)</code></td><td>digit [0-9], hex digit [0-9A-Fa-f]. Uppercase: non... [sed, regex]</td></tr>
 <tr><td><code>\l \u</code></td><td>lowercase letter [a-z], uppercase letter [sed, regex]</td></tr>
 <tr><td><code>\w \s (\W \S)</code></td><td>word character [0-9A-Za-z_], whitespace char (space, tab). Uppercase: non... [sed, regex]</td></tr>
 <tr><td><code>s/de/la&da/</code></td><td>& in replacement is the matched text</td></tr>
-</table>
-
-### Windows
-
-<table>
-<tr><td>WIN-H - turn on dictation</td></tr>
 </table>
 
 ### wsl

@@ -9,6 +9,13 @@ The definition file contains command definitions for the CLI builder.
 # Run
 
 # ------------------------------------------------------------------------------------------------------------
+= General
+# ------------------------------------------------------------------------------------------------------------
+
+edit run def (erd) ::
+    code $HOME/mjnurse/cli-builder/r.def
+
+# ------------------------------------------------------------------------------------------------------------
 = MDM
 # ------------------------------------------------------------------------------------------------------------
 
@@ -25,15 +32,17 @@ halt mdm (hm) ::
     mjn-stop-mdm
 
 # ------------------------------------------------------------------------------------------------------------
-= ES / Postgres
+= HO Borders
 # ------------------------------------------------------------------------------------------------------------
 
-start es (se) ::
-    mjn-start-es-pg es
+start hob (sh) ::
+    docker compose -f $HOME/ho-borders-poc/docker/docker-compose-apps.yml up -d
 
-start postgres (sp) ::
-    mjn-start-es-pg pg
+restart hob (rh) ::
+    docker compose -f $HOME/ho-borders-poc/docker/docker-compose-apps.yml restart
 
+halt hob (hh) ::
+    docker compose -f $HOME/ho-borders-poc/docker/docker-compose-apps.yml down
 
 # ------------------------------------------------------------------------------------------------------------
 = CLI-BUILDER
@@ -71,15 +80,17 @@ _r_complete() {
     done
 
 }
-complete -F _r_complete r @rhe @rsm @rrm @rhm @rse @rsp @rcba
+complete -F _r_complete r @rhe @rerd @rsm @rrm @rhm @rsh @rrh @rhh @rcba
 
 # Shortcut aliases
 alias @rhe='r rhe'
+alias @rerd='r rerd'
 alias @rsm='r rsm'
 alias @rrm='r rrm'
 alias @rhm='r rhm'
-alias @rse='r rse'
-alias @rsp='r rsp'
+alias @rsh='r rsh'
+alias @rrh='r rrh'
+alias @rhh='r rhh'
 alias @rcba='r rcba'
 ```
 
@@ -112,7 +123,7 @@ if [[ "$1" == "help" || "$1" == "rhe" ]]; then
    usage="\x1b[95mhelp \x1b[96m(rhe)\x1b[97m [filter]\x1b[92m # Show help, optionally filtered by pattern\x1b[0m"
    check_params $# 0 "Usage: $usage"
    
-   echo -e "\x1b[95mgenerated:2026-09-14 17:03\x1b[0m"
+   echo -e "\x1b[95mgenerated:2026-11-26 13:36\x1b[0m"
    echo
    filter="$1"
    if [[ -n "$filter" ]]; then
@@ -133,6 +144,16 @@ if [[ "$1" == "help" || "$1" == "rhe" ]]; then
      # Show everything
      while IFS= read -r line; do echo -e "${line}${CRESET}"; done < <(egrep "^section=|^   usage=" "$0" | sed "s/.*usage=/   /; s/.*section=/\x1b[92m/; s/\"//g")
    fi
+   exit
+fi
+section="General"
+
+if [[ "$1 $2 $3" == "edit run def" || "$1" == "rerd" ]]; then
+   [[ "$1" == "rerd" ]] && shift || shift 3
+   usage="\x1b[95medit run def \x1b[96m(rerd)\x1b[97m\x1b[0m"
+   check_params $# 0 "Usage: $usage"
+   print_command " code $HOME/mjnurse/cli-builder/r.def"
+   code $HOME/mjnurse/cli-builder/r.def
    exit
 fi
 section="MDM"
@@ -164,23 +185,32 @@ if [[ "$1 $2" == "halt mdm" || "$1" == "rhm" ]]; then
    mjn-stop-mdm
    exit
 fi
-section="ES / Postgres"
+section="HO Borders"
 
-if [[ "$1 $2" == "start es" || "$1" == "rse" ]]; then
-   [[ "$1" == "rse" ]] && shift || shift 2
-   usage="\x1b[95mstart es \x1b[96m(rse)\x1b[97m\x1b[0m"
+if [[ "$1 $2" == "start hob" || "$1" == "rsh" ]]; then
+   [[ "$1" == "rsh" ]] && shift || shift 2
+   usage="\x1b[95mstart hob \x1b[96m(rsh)\x1b[97m\x1b[0m"
    check_params $# 0 "Usage: $usage"
-   print_command " mjn-start-es-pg es"
-   mjn-start-es-pg es
+   print_command " docker compose -f $HOME/ho-borders-poc/docker/docker-compose-apps.yml up -d"
+   docker compose -f $HOME/ho-borders-poc/docker/docker-compose-apps.yml up -d
    exit
 fi
 
-if [[ "$1 $2" == "start postgres" || "$1" == "rsp" ]]; then
-   [[ "$1" == "rsp" ]] && shift || shift 2
-   usage="\x1b[95mstart postgres \x1b[96m(rsp)\x1b[97m\x1b[0m"
+if [[ "$1 $2" == "restart hob" || "$1" == "rrh" ]]; then
+   [[ "$1" == "rrh" ]] && shift || shift 2
+   usage="\x1b[95mrestart hob \x1b[96m(rrh)\x1b[97m\x1b[0m"
    check_params $# 0 "Usage: $usage"
-   print_command " mjn-start-es-pg pg"
-   mjn-start-es-pg pg
+   print_command " docker compose -f $HOME/ho-borders-poc/docker/docker-compose-apps.yml restart"
+   docker compose -f $HOME/ho-borders-poc/docker/docker-compose-apps.yml restart
+   exit
+fi
+
+if [[ "$1 $2" == "halt hob" || "$1" == "rhh" ]]; then
+   [[ "$1" == "rhh" ]] && shift || shift 2
+   usage="\x1b[95mhalt hob \x1b[96m(rhh)\x1b[97m\x1b[0m"
+   check_params $# 0 "Usage: $usage"
+   print_command " docker compose -f $HOME/ho-borders-poc/docker/docker-compose-apps.yml down"
+   docker compose -f $HOME/ho-borders-poc/docker/docker-compose-apps.yml down
    exit
 fi
 section="CLI-BUILDER"

@@ -53,9 +53,12 @@ errs (er) [<-f>] ::
     echo "" > /tmp/docker_err_p
     while [[ true ]]; do
         for c in $(docker ps --format '{{.Names}}'); do
-            docker logs $c 2>&1 | grep "ERROR:" | sed "s/^/$c: /"
+            docker logs $c 2>&1 | grep "ERROR " | sed "s/^/$c: /"
         done > /tmp/docker_err_c
-        grep -Fxvf /tmp/docker_err_p /tmp/docker_err_c
+        d="$(grep -Fxvf /tmp/docker_err_p /tmp/docker_err_c)"
+        if [[ "$d" != "" ]]; then
+            echo -e "$d\n--------------------"
+        fi
         mv -f /tmp/docker_err_c /tmp/docker_err_p
         if [[ $1 != -f ]]; then break; fi
         sleep 2
@@ -301,7 +304,7 @@ if [[ "$1" == "help" || "$1" == "dhe" ]]; then
    usage="\x1b[95mhelp \x1b[96m(dhe)\x1b[97m [filter]\x1b[92m # Show help, optionally filtered by pattern\x1b[0m"
    check_params $# 0 "Usage: $usage"
    
-   echo -e "\x1b[95mgenerated:2026-09-14 17:03\x1b[0m"
+   echo -e "\x1b[95mgenerated:2026-11-26 13:36\x1b[0m"
    echo
    filter="$1"
    if [[ -n "$filter" ]]; then
@@ -383,13 +386,16 @@ if [[ "$1" == "errs" || "$1" == "der" ]]; then
    [[ "$1" == "der" ]] && shift || shift 1
    usage="\x1b[95merrs \x1b[96m(der)\x1b[97m [-f]\x1b[0m"
    check_params $# 0 "Usage: $usage"
-   print_command " echo \"\" > /tmp/docker_err_p; while [[ true ]]; do; for c in $(docker ps --format '{{.Names}}'); do; docker logs $c 2>&1 | grep \"ERROR:\" | sed \"s/^/$c: /\"; done > /tmp/docker_err_c; grep -Fxvf /tmp/docker_err_p /tmp/docker_err_c; mv -f /tmp/docker_err_c /tmp/docker_err_p; if [[ $1 != -f ]]; then break; fi; sleep 2; done"
+   print_command " echo \"\" > /tmp/docker_err_p; while [[ true ]]; do; for c in $(docker ps --format '{{.Names}}'); do; docker logs $c 2>&1 | grep \"ERROR \" | sed \"s/^/$c: /\"; done > /tmp/docker_err_c; d=\"$(grep -Fxvf /tmp/docker_err_p /tmp/docker_err_c)\"; if [[ \"$d\" != \"\" ]]; then; echo -e \"$d\n--------------------\"; fi; mv -f /tmp/docker_err_c /tmp/docker_err_p; if [[ $1 != -f ]]; then break; fi; sleep 2; done"
    echo "" > /tmp/docker_err_p
    while [[ true ]]; do
        for c in $(docker ps --format '{{.Names}}'); do
-           docker logs $c 2>&1 | grep "ERROR:" | sed "s/^/$c: /"
+           docker logs $c 2>&1 | grep "ERROR " | sed "s/^/$c: /"
        done > /tmp/docker_err_c
-       grep -Fxvf /tmp/docker_err_p /tmp/docker_err_c
+       d="$(grep -Fxvf /tmp/docker_err_p /tmp/docker_err_c)"
+       if [[ "$d" != "" ]]; then
+           echo -e "$d\n--------------------"
+       fi
        mv -f /tmp/docker_err_c /tmp/docker_err_p
        if [[ $1 != -f ]]; then break; fi
        sleep 2
