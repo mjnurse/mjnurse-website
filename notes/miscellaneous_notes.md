@@ -97,12 +97,12 @@ The notes captured in the Linux notes tool = `n`.
 ### code
 
 <table>
-<tr><td>ALT+z - Enable word wrap</td></tr>
-<tr><td>CTRL+, - Open Settings</td></tr>
-<tr><td>CTRL+. - Fix problem</td></tr>
-<tr><td>CTRL+; - Find next problem (I added this shortcut)</td></tr>
-<tr><td>CTRL+k CTRL+s - Open Keyboard Shortcuts</td></tr>
-<tr><td>CTRL-k v - View markdown and markdown preview side by side</td></tr>
+<tr><td><code>ALT+z</code></td><td>Enable word wrap</td></tr>
+<tr><td><code>CTRL+,</code></td><td>Open Settings</td></tr>
+<tr><td><code>CTRL+.</code></td><td>Fix problem</td></tr>
+<tr><td><code>CTRL+;</code></td><td>Find next problem (I added this shortcut)</td></tr>
+<tr><td><code>CTRL+k CTRL+s</code></td><td>Open Keyboard Shortcuts</td></tr>
+<tr><td><code>CTRL-k v</code></td><td>View markdown and markdown preview side by side</td></tr>
 </table>
 
 ### column
@@ -250,6 +250,7 @@ The notes captured in the Linux notes tool = `n`.
 <table>
 <tr><td><code>/lala\C</code></td><td>Make search case sensitive (..\c - insensitive) [sed, regex]</td></tr>
 <tr><td><code>:%!sort -R</code></td><td>Random order - calling external app to order [sed, regex]</td></tr>
+<tr><td><code>:%s/\%&gt;100v.*/[+]/</code></td><td>\%&gt;100v skips up to col 100. .*/[+]/ replaces any text after with [+]</td></tr>
 <tr><td><code>\a (\A)</code></td><td>alphabetic character [A-Za-z]. Uppercase: non ... [sed, regex]</td></tr>
 <tr><td><code>\d \x (\D \X)</code></td><td>digit [0-9], hex digit [0-9A-Fa-f]. Uppercase: non... [sed, regex]</td></tr>
 <tr><td><code>\l \u</code></td><td>lowercase letter [a-z], uppercase letter [sed, regex]</td></tr>

@@ -139,7 +139,7 @@ if [[ "$1" == "help" || "$1" == "ghe" ]]; then
    echo -e "\x1b[92mGCloud (GCP)\x1b[0m"
    echo -e "\x1b[92m------------\x1b[0m"
    
-   echo -e "\x1b[95mgenerated:2026-11-26 09:06\x1b[0m"
+   echo -e "\x1b[95mgenerated:2026-11-26 13:36\x1b[0m"
    echo
    filter="$1"
    if [[ -n "$filter" ]]; then
